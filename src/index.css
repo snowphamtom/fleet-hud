@@ -1,24 +1,24 @@
 :root {
-  --bg: #f4f7fb;
-  --ink: #071018;
-  --mute: #3d4f66;
-  --cyan: #00d4ff;
-  --blue: #2f7bff;
-  --violet: #8a3dff;
-  --grant: #00a86b;
-  --refuse: #e11d48;
-  --line: rgba(10, 22, 44, 0.16);
-  --line-strong: rgba(10, 22, 44, 0.22);
-  --panel: #ffffff;
-  --panel-soft: rgba(255, 255, 255, 0.94);
-  --track: rgba(10, 22, 44, 0.09);
+  --bg: #05080d;
+  --bg-elev: #0a1018;
+  --ink: #d8e6f2;
+  --mute: #7a93a8;
+  --cyan: #00ffc8;
+  --blue: #3aa0ff;
+  --amber: #ffb020;
+  --violet: #8a6cff;
+  --done: #00d68f;
+  --hold: #ffb020;
+  --partial: #3aa0ff;
+  --danger: #ff4d6a;
+  --line: rgba(120, 170, 210, 0.14);
+  --line-strong: rgba(0, 255, 200, 0.28);
+  --panel: rgba(10, 16, 24, 0.92);
+  --panel-soft: rgba(14, 22, 34, 0.88);
+  --track: rgba(120, 170, 210, 0.1);
   --shadow:
-    0 0 0 1px rgba(10, 22, 44, 0.04),
-    0 1px 0 rgba(10, 22, 44, 0.05),
-    0 10px 28px rgba(15, 40, 90, 0.08);
-  --shadow-tight:
-    0 0 0 1px rgba(10, 22, 44, 0.06),
-    0 4px 14px rgba(15, 40, 90, 0.07);
+    0 0 0 1px rgba(0, 255, 200, 0.06),
+    0 12px 40px rgba(0, 0, 0, 0.45);
   --font: system-ui, -apple-system, 'Segoe UI', Inter, Roboto, sans-serif;
   --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
   --phone: 430px;
@@ -30,35 +30,17 @@
   -webkit-font-smoothing: antialiased;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html,
-body,
-#root {
-  margin: 0;
-  min-height: 100%;
-}
-
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { margin: 0; min-height: 100%; }
 body {
   min-width: 320px;
-  background: var(--bg);
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(0, 255, 200, 0.07), transparent 55%),
+    radial-gradient(800px 500px at 100% 20%, rgba(58, 160, 255, 0.06), transparent 50%),
+    var(--bg);
   color: var(--ink);
 }
-
-button,
-input {
-  font: inherit;
-}
-
-a {
-  color: var(--blue);
-}
-
-::selection {
-  background: rgba(0, 212, 255, 0.28);
-  color: var(--ink);
-}
+button, input { font: inherit; }
+a { color: var(--cyan); }
+code { font-family: var(--mono); font-size: 0.86em; }
+::selection { background: rgba(0, 255, 200, 0.28); color: #041018; }
