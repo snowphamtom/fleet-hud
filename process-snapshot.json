@@ -1,0 +1,67 @@
+{
+  "stamp": "2026-09-07T14:03:00-05:00",
+  "stampLabel": "2026-09-07 ~14:03 CT",
+  "ring": "Klaus Drive — Monsters Ink",
+  "drive": "yeti.monstersink@gmail.com",
+  "mara": {
+    "role": "Lead Scout",
+    "bot": "Eve",
+    "status": "DONE",
+    "rootFolders": 56,
+    "looseFiles": 300,
+    "looseFilesClaim": "≥300",
+    "rootTotalClaimed": "≥356",
+    "introOutroChildren": 42,
+    "shelves": ["00", "01", "01_Shadow", "02", "03", "04", "05", "06", "07", "08"],
+    "measured": "2026-09-07T13:58:32 CT",
+    "artifacts": ["drive_map.md", "duplicates.md", "pulse_delta.md"]
+  },
+  "cole": {
+    "role": "Copywriter",
+    "bot": "Create",
+    "status": "DONE",
+    "proposeRows": 26,
+    "packA": 8,
+    "packB": 13,
+    "packC": 5,
+    "law": "PROPOSE only · never rename/send/publish",
+    "artifacts": ["index.md"]
+  },
+  "rina": {
+    "role": "Visual Designer",
+    "bot": "Visual",
+    "status": "DONE",
+    "introOutroIntact": true,
+    "introOutroId": "1UQpaTqfl1A6fZ_-756A2t39NV3X0Lp-o",
+    "stayOptics": 8,
+    "propose07": 13,
+    "boundary": "never flatten / publish / overwrite",
+    "artifacts": ["plates.md"]
+  },
+  "vince": {
+    "role": "Ops Tracker",
+    "bot": "Bob",
+    "status": "HOLDING",
+    "gate": "approve[id]",
+    "executed": [
+      { "id": "plates-07", "alias": "H-07-BATCH", "dest": "07", "label": "MTP+FIG+GRIMM keep+cover" },
+      { "id": "archival-08", "alias": "H-08-BATCH", "dest": "08", "label": "glass dups+GRIMM spare+IMG wave" }
+    ],
+    "pending": [
+      { "id": "H-IO-GATE", "kind": "KEEP", "target": "intro-outro", "why": "do not empty" },
+      { "id": "H-SWEEP-DUP", "kind": "TRASH", "target": "LAYERED_DRIVE_SWEEP spare", "why": "dup · needs named approve + byte-check" }
+    ],
+    "artifacts": ["holds.md"]
+  },
+  "execute": {
+    "status": "PARTIAL",
+    "when": "2026-09-07T14:01:27 CT",
+    "plates07": { "moved": 13, "dest": "07_CORPUS_AND_CERTIFICATES", "fail": 0 },
+    "archival08": { "moved": 43, "dest": "08_ARCHIVAL_CARRIERS", "fail": 0, "breakdown": { "named": 3, "img": 22, "uuid": 17, "misc": 1 } },
+    "totalMoves": 56,
+    "totalFail": 0,
+    "pendingGates": ["H-IO-GATE", "H-SWEEP-DUP"],
+    "artifacts": ["EXECUTED_2026-09-07.md"]
+  },
+  "locks": ["MAGPIE", "NAME_LOCK", "00–08 frozen", "no PPA", "claimed≤interior", "WALLE fail-closed"]
+}
