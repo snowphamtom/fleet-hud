@@ -19,12 +19,12 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/icon.svg', 'icons/apple-touch-icon.png'],
       manifest: {
-        name: 'Fleet HUD — Sorting Machine',
-        short_name: 'Fleet HUD',
+        name: 'Fleet HUD — Klaus Drive PROCESS',
+        short_name: 'Fleet HUD — Klaus Drive PROCESS',
         description:
-          'Phone-first fleet HUD shell for the C≤S sorting machine. Intake → Filter → Evidence → Verdict → Store.',
-        theme_color: '#f7f9fc',
-        background_color: '#f7f9fc',
+          'Dark forensic Klaus Drive ring PROCESS — Mara → Cole → Rina → Vince → Execute.',
+        theme_color: '#05080d',
+        background_color: '#05080d',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/fleet-hud/',

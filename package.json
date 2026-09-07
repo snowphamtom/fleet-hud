@@ -27,6 +27,6 @@
     "vite-plugin-pwa": "^1.3.0",
     "workbox-window": "^7.4.1"
   },
-  "description": "Phone-first Fleet HUD sorting machine PWA",
+  "description": "Klaus Drive ring PROCESS — dark forensic Fleet HUD PWA",
   "homepage": "https://snowphamtom.github.io/fleet-hud/"
 }

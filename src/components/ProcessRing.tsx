@@ -11,11 +11,11 @@ type StageMeta = {
 }
 
 const STAGES: StageMeta[] = [
-  { id: 'mara', label: 'MAP', short: 'INTAKE', angle: -90 },
-  { id: 'cole', label: 'PROPOSE', short: 'INDEX', angle: -18 },
-  { id: 'rina', label: 'PLATES', short: 'OPTIC', angle: 54 },
-  { id: 'vince', label: 'HOLDS', short: 'GATE', angle: 126 },
-  { id: 'execute', label: 'EXECUTED', short: 'MOVES', angle: 198 },
+  { id: 'mara', label: 'MARA', short: 'SCAN', angle: -90 },
+  { id: 'cole', label: 'COLE', short: 'PROPOSE', angle: -18 },
+  { id: 'rina', label: 'RINA', short: 'PLATES', angle: 54 },
+  { id: 'vince', label: 'VINCE', short: 'HOLDS', angle: 126 },
+  { id: 'execute', label: 'EXECUTE', short: 'MOVES', angle: 198 },
 ]
 
 function statusTone(id: StageId, snap: ProcessSnapshot): 'done' | 'hold' | 'partial' {
