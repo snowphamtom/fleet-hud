@@ -66,14 +66,14 @@ export function SortingDemo({ ledger, onSort }: Props) {
       <div className="demo-row">
         <button
           type="button"
-          className="btn grant"
+          className="btn grant grant-btn"
           onClick={() => run(DEMO_GRANT.label, DEMO_GRANT.claimed, DEMO_GRANT.source)}
         >
           Demo GRANT
         </button>
         <button
           type="button"
-          className="btn refuse"
+          className="btn refuse refuse-btn"
           onClick={() => run(DEMO_REFUSE.label, DEMO_REFUSE.claimed, DEMO_REFUSE.source)}
         >
           Demo REFUSE
@@ -170,7 +170,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
                     ))}
                   </div>
                 </div>
-                <span className={`stamp ${e.verdict.toLowerCase()}`}>{e.verdict}</span>
+                <span className={`stamp verdict-stamp ${e.verdict.toLowerCase()}`}>{e.verdict}</span>
               </li>
             ))}
           </ul>

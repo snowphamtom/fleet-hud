@@ -18,6 +18,31 @@ const EMPTY_COUNTS: Record<Stage, number> = {
   Store: 0,
 }
 
+const ACCESS = [
+  { name: 'mail', pct: 86 },
+  { name: 'calendar', pct: 62 },
+  { name: 'drive', pct: 74 },
+  { name: 'contacts', pct: 41 },
+  { name: 'billing', pct: 28 },
+] as const
+
+const BOTS = [
+  { name: 'SCOUT', state: 'run' as const },
+  { name: 'PATCH', state: 'run' as const },
+  { name: 'PROXY', state: 'run' as const },
+  { name: 'CLOSE', state: 'idle' as const },
+  { name: 'DROP', state: 'idle' as const },
+  { name: 'BELL', state: 'idle' as const },
+]
+
+const RUN_SEED = [
+  { t: 'init: fork subdevice', kw: 'new', n: '01' },
+  { t: 'auth: remote added', kw: 'granted', n: '02' },
+  { t: 'action: follow-up', kw: 'new', n: '03' },
+  { t: 'event: grant init', kw: 'granted', n: '04' },
+  { t: 'trace: prefer-live', kw: 'new', n: '05' },
+] as const
+
 export default function App() {
   const [ledger, setLedger] = useState<LedgerEntry[]>([])
   const [stageCounts, setStageCounts] = useState(EMPTY_COUNTS)
@@ -33,6 +58,8 @@ export default function App() {
       Store: prev.Store + 1,
     }))
   }, [])
+
+  const lastVerdict = ledger[0]?.verdict ?? null
 
   return (
     <div className="app">
@@ -63,8 +90,127 @@ export default function App() {
             </a>
           </div>
           <div className="hero-viz">
+            <span className="hero-float a">SUBNET_004</span>
+            <span className="hero-float b">ACTIVE_CORE</span>
+            <span className="hero-float c">TRACE_002</span>
             <DendriteRing size={200} />
           </div>
+        </section>
+
+        {/* FUI modular status chrome — client demo only */}
+        <section className="fleet-modules" aria-label="Fleet status modules">
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// RUN LOG</span>
+              <span className="section-value">{metrics.actions.toLocaleString()}</span>
+            </div>
+            <ul className="run-log">
+              {RUN_SEED.map((row) => (
+                <li key={row.n}>
+                  <span>
+                    <span className={`kw ${row.kw === 'granted' ? 'grant' : 'new'}`}>{row.kw}</span>{' '}
+                    {row.t}
+                  </span>
+                  <span className="n">{row.n}</span>
+                </li>
+              ))}
+              {ledger.slice(0, 3).map((e) => (
+                <li key={e.id}>
+                  <span>
+                    <span className={`kw ${e.verdict === 'GRANT' ? 'grant' : ''}`}>
+                      {e.verdict.toLowerCase()}
+                    </span>{' '}
+                    {e.label.slice(0, 28)}
+                  </span>
+                  <span className="n">{e.result.lines.length}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// ACCESS LEDGER</span>
+            </div>
+            <div className="access-rows">
+              {ACCESS.map((row) => (
+                <div key={row.name} className="access-row">
+                  <span>{row.name}</span>
+                  <div className="bar-track">
+                    <div className="bar-fill" style={{ width: `${row.pct}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="panel-foot">6 days reachable from one login</div>
+          </article>
+
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// BLAST RADIUS</span>
+            </div>
+            <div className="blast">
+              <div className="blast-gauge" aria-hidden>
+                <span className="blast-num">3</span>
+              </div>
+              <div className="blast-copy">
+                any stuck machine stops every bot · entering a bot leaves the session
+              </div>
+            </div>
+          </article>
+
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// BOT STATUS</span>
+              <span className="section-value">3/6</span>
+            </div>
+            <ul className="bot-list">
+              {BOTS.map((b) => (
+                <li key={b.name} className={`bot-row ${b.state}`}>
+                  <span className="name">{b.name}</span>
+                  <span className="bot-segs" aria-hidden>
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span className="bot-state">{b.state}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// ACTION HEAT</span>
+            </div>
+            <div className="heat-grid" aria-hidden>
+              {metrics.heat.map((v, i) => (
+                <span
+                  key={i}
+                  style={{
+                    background: `linear-gradient(135deg, rgba(0,194,255,${0.12 + v * 0.78}), rgba(122,61,255,${0.08 + v * 0.62}))`,
+                  }}
+                />
+              ))}
+            </div>
+          </article>
+
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// THROUGHPUT</span>
+              <span className="section-value">{metrics.throughput}/s</span>
+            </div>
+            <div className="thru-bars" aria-hidden>
+              {metrics.bars.map((v, i) => (
+                <span key={i} style={{ height: `${Math.round(v * 100)}%` }} />
+              ))}
+            </div>
+            <div className="thru-pulse" aria-hidden />
+            <div className="panel-foot">
+              route health {metrics.routeHealth}% · // trace sync
+            </div>
+          </article>
         </section>
 
         <StagePanels
@@ -74,6 +220,15 @@ export default function App() {
         />
 
         <SortingDemo ledger={ledger} onSort={onSort} />
+
+        <div className="result-strip" aria-live="polite">
+          <span>// RESULT STAMP</span>
+          {lastVerdict ? (
+            <span className={`stamp ${lastVerdict.toLowerCase()}`}>{lastVerdict}</span>
+          ) : (
+            <span>awaiting Demo GRANT / REFUSE</span>
+          )}
+        </div>
 
         <div className="bottom-grid">
           <GrokStub />
