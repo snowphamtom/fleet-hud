@@ -1,15 +1,29 @@
-/** All Gas stack stubs — URLs/config only (no quirky-rhinoceros attach). */
+/** All Gas stack stubs — env only. Never attach quirky-rhinoceros; Heavy owns NEW Convex. */
+const PLACEHOLDER_CLOUD = 'https://YOUR_DEPLOYMENT.convex.cloud'
+const PLACEHOLDER_SITE = 'https://YOUR_DEPLOYMENT.convex.site'
+
+function envOr(key: keyof ImportMetaEnv, fallback: string): string {
+  const v = import.meta.env[key]
+  return typeof v === 'string' && v.trim() ? v.trim() : fallback
+}
+
+function isPlaceholder(url: string): boolean {
+  return !url || url.includes('YOUR_DEPLOYMENT') || url.includes('placeholder')
+}
+
 export const ALL_GAS = {
   convex: {
-    url: import.meta.env.VITE_CONVEX_URL ?? 'https://YOUR_DEPLOYMENT.convex.cloud',
-    site: import.meta.env.VITE_CONVEX_SITE ?? 'https://YOUR_DEPLOYMENT.convex.site',
+    url: envOr('VITE_CONVEX_URL', PLACEHOLDER_CLOUD),
+    site: envOr('VITE_CONVEX_SITE', PLACEHOLDER_SITE),
+    /** False until Heavy sets VITE_CONVEX_URL on Pages / local .env */
+    configured: !isPlaceholder(envOr('VITE_CONVEX_URL', PLACEHOLDER_CLOUD)),
   },
   firecrawl: {
-    apiBase: import.meta.env.VITE_FIRECRAWL_URL ?? 'https://api.firecrawl.dev/v1',
+    apiBase: envOr('VITE_FIRECRAWL_URL', 'https://api.firecrawl.dev/v1'),
     stub: true,
   },
   agentMail: {
-    inbox: import.meta.env.VITE_AGENTMAIL_INBOX ?? 'intake@example.agentmail.to',
+    inbox: envOr('VITE_AGENTMAIL_INBOX', 'inbox@example.agentmail.to'),
     stub: true,
   },
   grok: {
