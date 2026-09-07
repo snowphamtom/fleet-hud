@@ -7,9 +7,13 @@
  */
 import { useEffect, useMemo, useRef } from 'react'
 import {
+  bucketOf,
+  fiberColor,
   fiberSortFromLines,
-  isGrantNode,
+  freshnessOf,
   residualOf,
+  sizeWeight,
+  type FiberBucket,
   type FiberNode,
   type FiberSort,
 } from '../lib/fiber'
@@ -42,17 +46,24 @@ const SEGS_V = 14
 const NODE_COUNT = 64
 const DUST = 72
 
-/** Dandelin foci of the cutting-plane ellipse (GRANT=F, REFUSE=F′) */
-const FOCUS_GRANT = { x: CX - 42, y: CY + 2 }
-const FOCUS_REFUSE = { x: CX + 42, y: CY + 2 }
+/** Bucket foci — cyan/violet/green/red by DATA metrics */
+const FOCUS: Record<FiberBucket, { x: number; y: number }> = {
+  grant: { x: CX - 44, y: CY - 6 },
+  keep: { x: CX - 28, y: CY + 36 },
+  watch: { x: CX + 28, y: CY + 36 },
+  refuse: { x: CX + 44, y: CY - 6 },
+  ignore: { x: CX, y: CY - 48 },
+}
+const FOCUS_GRANT = FOCUS.grant
+const FOCUS_REFUSE = FOCUS.refuse
 /** Soft cone apex for generator arcs */
 const APEX = { x: CX, y: CY - 78 }
 
-/** Phase timings (ms) */
-const T_SCRAMBLE = 140
-const T_SORT = 480
-const T_SETTLE_HOLD = 700
-const T_EASE_HOME = 400
+/** Hyper-speed Drive spider web (ms) */
+const T_SCRAMBLE = 90
+const T_SORT = 280
+const T_SETTLE_HOLD = 420
+const T_EASE_HOME = 260
 
 function torusPoint(u: number, v: number, tilt = TILT): Pt {
   const cosU = Math.cos(u)
@@ -126,7 +137,9 @@ type Movable = {
   source: number
   overage: number
   residual: number
-  /** 0..1 normalized data weight from |residual| / claimed */
+  bucket: FiberBucket
+  color: string
+  /** 0..1 normalized data weight from metrics */
   weight: number
 }
 
@@ -289,6 +302,8 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
       source: 0,
       overage: 0,
       residual: 0,
+      bucket: 'ignore',
+      color: '#5a6a88',
       weight: 0.15,
     }))
   }, [mesh])
@@ -307,11 +322,21 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
     }
 
     const nodes = fs.nodes
-    const okCount = fs.grantIds.length
-    const badCount = fs.refuseIds.length
-    let okIdx = 0
-    let badIdx = 0
 
+    const bucketIdx: Record<FiberBucket, number> = {
+      grant: 0,
+      refuse: 0,
+      keep: 0,
+      watch: 0,
+      ignore: 0,
+    }
+    const bucketN: Record<FiberBucket, number> = {
+      grant: Math.max(fs.grantIds?.length ?? 0, 1),
+      refuse: Math.max(fs.refuseIds?.length ?? 0, 1),
+      keep: Math.max(fs.keepIds?.length ?? 0, 1),
+      watch: Math.max(fs.watchIds?.length ?? 0, 1),
+      ignore: Math.max(fs.ignoreIds?.length ?? 0, 1),
+    }
     const maxAbsRes = Math.max(
       1,
       ...nodes.map((n) => Math.abs(residualOf(n))),
@@ -319,29 +344,30 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
     movablesRef.current = movablesRef.current.map((m) => {
       const node = nodes[m.id % nodes.length]
       const residual = residualOf(node)
-      const ok = isGrantNode(node)
-      const idx = ok ? okIdx++ : badIdx++
-      const nSide = ok
-        ? Math.max(okCount, 1) * Math.ceil(NODE_COUNT / nodes.length)
-        : Math.max(badCount, 1) * Math.ceil(NODE_COUNT / nodes.length)
-      const focus = ok ? FOCUS_GRANT : FOCUS_REFUSE
-      // DATA weight from residual magnitude (not label text)
-      const weight = ok
-        ? 0.2 + 0.55 * (1 - Math.min(1, node.claimed / Math.max(node.source, 1e-6)))
-        : 0.35 + 0.65 * Math.min(1, residual / maxAbsRes)
-      const burstAng = m.theta + (hash(m.id, sortKey) - 0.5) * 1.8
-      const burstR = 14 + weight * 52 + hash(m.id, sortKey + 3) * 18
+      const bucket = bucketOf(node)
+      const ok = bucket === 'grant' || bucket === 'keep'
+      const idx = bucketIdx[bucket]++
+      const nSide = bucketN[bucket] * Math.ceil(NODE_COUNT / Math.max(nodes.length, 1))
+      const focus = FOCUS[bucket]
+      // DATA weight: |residual| + size + (1-freshness) — not label text
+      const wRes = Math.min(1, Math.abs(residual) / maxAbsRes)
+      const weight = Math.min(
+        1,
+        0.18 + 0.42 * wRes + 0.25 * sizeWeight(node) + 0.2 * (1 - freshnessOf(node)),
+      )
+      const burstAng = m.theta + (hash(m.id, sortKey) - 0.5) * 2.2
+      const burstR = 10 + weight * 58 + hash(m.id, sortKey + 3) * 16
       const scramble = {
-        x: CX + Math.cos(burstAng) * burstR + (hash(m.id, 8) - 0.5) * 12,
-        y: CY + Math.sin(burstAng) * burstR * 0.72 - 8,
+        x: CX + Math.cos(burstAng) * burstR + (hash(m.id, 8) - 0.5) * 14,
+        y: CY + Math.sin(burstAng) * burstR * 0.72 - 6,
       }
-      const target = focusCluster(focus, idx, Math.max(nSide, 8))
-      if (!ok) {
-        const push = 1 + weight * 0.55
+      const target = focusCluster(focus, idx, Math.max(nSide, 6))
+      if (bucket === 'refuse' || bucket === 'ignore') {
+        const push = 1 + weight * 0.5
         target.x = focus.x + (target.x - focus.x) * push
         target.y = focus.y + (target.y - focus.y) * push
       }
-      const lineIndex = Number.parseInt(node.id.split('-').pop() ?? '0', 10) || 0
+      const lineIndex = Number.parseInt(String(node.id).split('-').pop() ?? '0', 10) || m.id % 64
       return {
         ...m,
         ok,
@@ -352,8 +378,10 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
         lineIndex,
         claimed: node.claimed,
         source: node.source,
-        overage: ok ? 0 : residual,
+        overage: residual > 0 ? residual : 0,
         residual,
+        bucket,
+        color: fiberColor(node),
         weight,
       }
     })
@@ -452,9 +480,10 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
             el.setAttribute('cx', String(p.x))
             el.setAttribute('cy', String(p.y))
             el.setAttribute('r', String((1.4 + m.weight * 2.2) * (1 - t * 0.15)))
-            el.setAttribute('fill', m.ok ? '#3dfff0' : '#ff6b8a')
+            el.setAttribute('fill', m.color)
             el.setAttribute('opacity', String(0.78 + t * 0.22))
             el.setAttribute('data-line', String(m.lineIndex))
+            el.setAttribute('data-bucket', m.bucket)
             el.setAttribute('data-overage', String(m.overage))
             el.setAttribute('data-weight', m.weight.toFixed(3))
           }
@@ -484,11 +513,13 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
                 const a = fromPts[0]
                 const b = toPts[0]
                 const mag = Math.min(1, Math.abs(e.residual) / 40)
-                const refuse = e.residual > 0
-                const stroke = refuse
-                  ? `rgba(255,107,138,${0.2 + mag * 0.55})`
-                  : `rgba(61,255,240,${0.18 + (1 - mag) * 0.4})`
-                const sw = 0.4 + mag * 1.6 + (a.w + b.w) * 0.35
+                // cyan→violet→green→red by endpoint data (avg)
+                const stroke = a.ok && b.ok
+                  ? `rgba(61,255,240,${0.2 + mag * 0.45})`
+                  : !a.ok && !b.ok
+                    ? `rgba(255,107,138,${0.22 + mag * 0.5})`
+                    : `rgba(180,77,255,${0.2 + mag * 0.4})`
+                const sw = 0.35 + mag * 1.5 + (a.w + b.w) * 0.4
                 html += `<line data-from="${e.from}" data-to="${e.to}" data-residual="${e.residual}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${stroke}" stroke-width="${sw}" opacity="${0.4 + t * 0.45}" />`
                 // secondary spokes: denser web without costume labels
                 if (fromPts.length > 2 && toPts.length > 2) {
@@ -534,7 +565,7 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
             const el = els[i]
             if (!el) continue
             // Goldstone tangential drift around focus + radial restore
-            const focus = m.ok ? FOCUS_GRANT : FOCUS_REFUSE
+            const focus = FOCUS[m.bucket] ?? FOCUS_GRANT
             const dx = m.target.x - focus.x
             const dy = m.target.y - focus.y
             const rad = Math.hypot(dx, dy) || 1
@@ -548,11 +579,12 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
             const gy = focus.y + Math.sin(ang) * rNow * 0.92
             el.setAttribute('cx', String(gx))
             el.setAttribute('cy', String(gy))
-            el.setAttribute('r', '1.9')
-            el.setAttribute('fill', m.ok ? '#3dfff0' : '#ff6b8a')
+            el.setAttribute('r', String(1.5 + m.weight * 1.1))
+            el.setAttribute('fill', m.color)
             el.setAttribute('opacity', '0.98')
             if (m.fiberId) el.setAttribute('data-fiber', m.fiberId)
             el.setAttribute('data-line', String(m.lineIndex))
+            el.setAttribute('data-bucket', m.bucket)
             el.setAttribute('data-residual', String(m.residual))
           }
           if (coreLabelRef.current) {
@@ -583,9 +615,7 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
                 ? hueT > 0.55
                   ? 'url(#nodeViolet)'
                   : 'url(#nodeCyan)'
-                : m.ok
-                  ? '#3dfff0'
-                  : '#ff6b8a',
+                : m.color,
             )
             el.setAttribute('opacity', String(lerp(0.98, 0.7, t)))
           }
@@ -850,27 +880,12 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
         ))}
       </g>
 
-      {/* Focus zone hints */}
-      <ellipse
-        className="cluster-hint grant-hint"
-        cx={FOCUS_GRANT.x}
-        cy={FOCUS_GRANT.y}
-        rx="30"
-        ry="34"
-        fill="rgba(61,255,240,0.06)"
-        stroke="rgba(61,255,240,0.28)"
-        strokeWidth="0.6"
-      />
-      <ellipse
-        className="cluster-hint refuse-hint"
-        cx={FOCUS_REFUSE.x}
-        cy={FOCUS_REFUSE.y}
-        rx="30"
-        ry="34"
-        fill="rgba(255,107,138,0.06)"
-        stroke="rgba(255,107,138,0.28)"
-        strokeWidth="0.6"
-      />
+      {/* Bucket foci — color by data lane */}
+      <ellipse className="cluster-hint" cx={FOCUS.grant.x} cy={FOCUS.grant.y} rx="26" ry="28" fill="rgba(61,255,240,0.07)" stroke="rgba(61,255,240,0.3)" strokeWidth="0.55" />
+      <ellipse className="cluster-hint" cx={FOCUS.refuse.x} cy={FOCUS.refuse.y} rx="26" ry="28" fill="rgba(255,107,138,0.07)" stroke="rgba(255,107,138,0.3)" strokeWidth="0.55" />
+      <ellipse className="cluster-hint" cx={FOCUS.keep.x} cy={FOCUS.keep.y} rx="22" ry="20" fill="rgba(93,255,154,0.06)" stroke="rgba(93,255,154,0.28)" strokeWidth="0.5" />
+      <ellipse className="cluster-hint" cx={FOCUS.watch.x} cy={FOCUS.watch.y} rx="22" ry="20" fill="rgba(180,77,255,0.06)" stroke="rgba(180,77,255,0.28)" strokeWidth="0.5" />
+      <ellipse className="cluster-hint" cx={FOCUS.ignore.x} cy={FOCUS.ignore.y} rx="20" ry="16" fill="rgba(90,106,136,0.08)" stroke="rgba(90,106,136,0.35)" strokeWidth="0.45" />
 
       <circle
         ref={coreRingRef}

@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import type { FiberNode, FiberSort } from './lib/fiber'
 import type { Verdict } from './lib/sort'
 import { DendriteRing } from './components/DendriteRing'
+import { FiberEvidence } from './components/FiberEvidence'
 import { GrokStub } from './components/GrokStub'
 import { HudBar } from './components/HudBar'
 import { InstallHint } from './components/InstallHint'
@@ -115,14 +116,10 @@ export default function App() {
               verdict={sortViz?.verdict ?? null}
               onFiberClick={(node) => setFiberEvidence(node)}
             />
-            {fiberEvidence ? (
-              <p className="fiber-evidence" role="status">
-                fiber {fiberEvidence.label}: C={fiberEvidence.claimed} S={fiberEvidence.source}
-                {fiberEvidence.claimed <= fiberEvidence.source
-                  ? ' · C≤S'
-                  : ` · residual +${fiberEvidence.claimed - fiberEvidence.source}`}
-              </p>
-            ) : null}
+            <FiberEvidence
+              node={fiberEvidence}
+              onClose={() => setFiberEvidence(null)}
+            />
           </div>
         </section>
 

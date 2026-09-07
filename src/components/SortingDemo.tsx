@@ -1,5 +1,10 @@
 import { useMemo, useState } from 'react'
-import { buildFiberSort, type FiberSort } from '../lib/fiber'
+import {
+  buildDemoDriveFiberSort,
+  buildFiberSort,
+  fiberVerdict,
+  type FiberSort,
+} from '../lib/fiber'
 import {
   DEMO_GRANT,
   DEMO_REFUSE,
@@ -63,10 +68,39 @@ export function SortingDemo({ ledger, onSort }: Props) {
     run('Manual sort', c, s)
   }
 
+  function runDriveWeb() {
+    const fiber = buildDemoDriveFiberSort()
+    const claimed = fiber.nodes.map((n) => n.claimed)
+    const source = fiber.nodes.map((n) => n.source)
+    const result = sortClaim(
+      claimed.length ? claimed : [0],
+      source.length ? source : [0],
+    )
+    // Prefer Drive metrics verdict from buckets
+    const verdict = fiber.refuseIds.length ? 'REFUSE' : fiberVerdict(fiber)
+    setClaimedRaw(claimed.slice(0, 8).join(', ') + (claimed.length > 8 ? ', …' : ''))
+    setSourceRaw(source.slice(0, 8).join(', ') + (source.length > 8 ? ', …' : ''))
+    setLast(result)
+    onSort({
+      id: makeId(),
+      at: Date.now(),
+      label: `Demo Drive Sort · ${fiber.nodes.length} units`,
+      verdict,
+      result: { ...result, verdict, lines: fiber.nodes.map((n, i) => ({
+        index: i,
+        claimed: n.claimed,
+        source: n.source,
+        ok: n.claimed <= n.source,
+        overage: Math.max(0, n.claimed - n.source),
+      })) },
+      fiber,
+    })
+  }
+
   return (
     <section className="sorting-block">
       <SectionLabel title="TRY" value="C ≤ S" accent />
-      <p className="try-hint">Tap Demo GRANT / Demo REFUSE — real click → real ledger state.</p>
+      <p className="try-hint">Tap Demo GRANT / Demo REFUSE / Demo Drive Sort — metrics → keep/watch/ignore.</p>
       <div className="demo-row">
         <button
           type="button"
@@ -81,6 +115,9 @@ export function SortingDemo({ ledger, onSort }: Props) {
           onClick={() => run(DEMO_REFUSE.label, DEMO_REFUSE.claimed, DEMO_REFUSE.source)}
         >
           Demo REFUSE
+        </button>
+        <button type="button" className="btn primary" onClick={runDriveWeb}>
+          Demo Drive Sort
         </button>
       </div>
 
@@ -163,7 +200,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
       <article className="panel ledger-panel">
         <SectionLabel title="LEDGER" value={ledger.length} />
         {ledger.length === 0 ? (
-          <div className="awaiting">AWAITING LEDGER — tap Demo GRANT or Demo REFUSE</div>
+          <div className="awaiting">AWAITING LEDGER — tap Demo GRANT / REFUSE / Drive Sort</div>
         ) : (
           <ul className="ledger">
             {ledger.map((e) => (

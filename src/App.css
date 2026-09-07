@@ -1631,3 +1631,71 @@
 .dendrite-sort-nodes {
   cursor: pointer;
 }
+
+
+/* Drive spider-web evidence — data chip, not costume */
+.fiber-evidence-panel {
+  margin-top: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(61, 255, 240, 0.22);
+  background: rgba(6, 10, 18, 0.92);
+}
+.fiber-evidence-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.fiber-evidence-swatch {
+  height: 3px;
+  border-radius: 2px;
+  margin: 0.45rem 0 0.55rem;
+}
+.fiber-evidence-grid {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+}
+.fiber-evidence-grid dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(180, 200, 230, 0.55);
+}
+.fiber-evidence-grid dd {
+  margin: 0.05rem 0 0;
+  font-size: 0.82rem;
+  color: #e8f0ff;
+  word-break: break-word;
+}
+.fiber-evidence-grid .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.75rem;
+}
+.fiber-evidence-grid .dim,
+.fiber-evidence-panel .dim {
+  color: rgba(180, 200, 230, 0.55);
+  font-weight: 400;
+}
+.btn.compact {
+  min-height: 36px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+}
+.bucket-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+.bucket-chip {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.bucket-chip.grant { color: #3dfff0; border-color: rgba(61, 255, 240, 0.35); }
+.bucket-chip.refuse { color: #ff6b8a; border-color: rgba(255, 107, 138, 0.35); }
+.bucket-chip.keep { color: #5dff9a; border-color: rgba(93, 255, 154, 0.35); }
+.bucket-chip.watch { color: #b44dff; border-color: rgba(180, 77, 255, 0.35); }
+.bucket-chip.ignore { color: #8a9bb8; border-color: rgba(90, 106, 136, 0.4); }

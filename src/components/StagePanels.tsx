@@ -1,5 +1,5 @@
 import { STAGES, type Stage } from '../lib/config'
-import type { FiberSort } from '../lib/fiber'
+import { bucketCounts, type FiberSort } from '../lib/fiber'
 import { SectionLabel } from './SectionLabel'
 
 type Props = {
@@ -61,8 +61,14 @@ export function StagePanels({ pulse, metrics, stageCounts, fiberSort }: Props) {
           {fiberSort ? (
             <>
               {' '}
-              · fiber G={fiberSort.grantIds.length} R={fiberSort.refuseIds.length} ·{' '}
-              {fiberSort.edges.length}e
+              · fiber {fiberSort.edges.length}e
+              <div className="bucket-chips">
+                {(Object.entries(bucketCounts(fiberSort)) as [string, number][]).map(([k, v]) => (
+                  <span key={k} className={`bucket-chip ${k}`}>
+                    {k} {v}
+                  </span>
+                ))}
+              </div>
             </>
           ) : null}
         </div>
