@@ -93,7 +93,7 @@ export default function App() {
             <span className="hero-float a">SUBNET_004</span>
             <span className="hero-float b">ACTIVE_CORE</span>
             <span className="hero-float c">TRACE_002</span>
-            <DendriteRing size={280} />
+            <DendriteRing size={292} />
           </div>
         </section>
 
