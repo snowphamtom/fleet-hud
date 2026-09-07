@@ -6,9 +6,9 @@ import { ALL_GAS } from './lib/config'
 import {
   formatCt,
   formatSyncedAgo,
-  getLatestRef,
+  getLiveRef,
   litTargetFromSnap,
-  resolveSnap,
+  mergeLive,
   tagClass,
 } from './lib/processLive'
 import snapJson from './data/processSnapshot.json'
@@ -199,9 +199,9 @@ function StageDetail({ id, snap }: { id: StageId; snap: ProcessSnapshot }) {
 }
 
 function LiveApp() {
-  const live = useQuery(getLatestRef, ALL_GAS.convex.configured ? {} : 'skip')
+  const live = useQuery(getLiveRef, ALL_GAS.convex.configured ? {} : 'skip')
   const { snap, source, lastSyncedAt } = useMemo(
-    () => resolveSnap(EMBEDDED, live ?? null),
+    () => mergeLive(EMBEDDED, live ?? null),
     [live],
   )
   const [active, setActive] = useState<StageId>('execute')
@@ -394,7 +394,7 @@ function LiveApp() {
               </li>
               <li>
                 <span>Snapshot</span>
-                <code>{source === 'convex' ? 'processRing:getLatest' : 'embedded JSON'}</code>
+                <code>{source === 'convex' ? 'process:getLive' : 'embedded JSON'}</code>
               </li>
               <li>
                 <span>Ring</span>
