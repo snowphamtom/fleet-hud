@@ -4,7 +4,9 @@ Dark forensic PWA showing the Klaus Drive ring process:
 
 **MARA** (inventory) → **COLE** (PROPOSE) → **RINA** (plates) → **VINCE** (`approve[id]` holds) → **EXECUTE** (moves).
 
-Embedded snapshot: `src/data/processSnapshot.json` (GH Pages offline). Convex: `fleet-gerbil-682` when `VITE_CONVEX_URL` set.
+- Live: Convex `process.getLive` on `fleet-gerbil-682` (continuous subscribe).
+- Fallback: embedded `src/data/processSnapshot.json` when offline.
+- Sync state → Convex: `/workspace/allgas-convex/scripts/syncProcessFromState.mjs` (see `MANAGER_SYNC.md`).
 
 Live: https://snowphamtom.github.io/fleet-hud/
 
