@@ -18,6 +18,8 @@ type Props = {
   sortKey?: number
   lines?: LineDelta[]
   verdict?: Verdict | null
+  /** Click a sorted fiber node → evidence (line data), not a costume label. */
+  onFiberClick?: (line: LineDelta) => void
 }
 
 const CX = 100
@@ -106,6 +108,13 @@ type Movable = {
   ok: boolean
   /** Angle on idle ring for Goldstone tangential drift */
   theta: number
+  /** Bound sort-line data (C/S/overage) — drives weight/speed/color, not labels */
+  lineIndex: number
+  claimed: number
+  source: number
+  overage: number
+  /** 0..1 normalized data weight from overage / claimed */
+  weight: number
 }
 
 function buildMesh() {
@@ -192,7 +201,7 @@ function generatorCtrl(
   }
 }
 
-export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }: Props) {
+export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, onFiberClick }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const latticeRef = useRef<SVGGElement>(null)
   const nodesRef = useRef<SVGGElement>(null)
@@ -216,6 +225,24 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
   }, [lines, verdict])
 
   useEffect(() => {
+    const root = nodesRef.current
+    if (!root || !onFiberClick) return
+    const onClick = (ev: MouseEvent) => {
+      const t = ev.target as Element | null
+      if (!t || t.tagName !== 'circle') return
+      const lineAttr = t.getAttribute('data-line')
+      if (lineAttr == null) return
+      const lineIndex = Number(lineAttr)
+      const ls = linesRef.current
+      const line = ls?.find((l) => l.index === lineIndex)
+      if (line) onFiberClick(line)
+    }
+    root.addEventListener('click', onClick)
+    root.style.cursor = 'pointer'
+    return () => root.removeEventListener('click', onClick)
+  }, [onFiberClick])
+
+  useEffect(() => {
     movablesRef.current = mesh.homes.map((home, id) => ({
       home,
       id,
@@ -224,6 +251,11 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
       target: { x: home.x, y: home.y },
       ok: true,
       theta: (id / NODE_COUNT) * Math.PI * 2,
+      lineIndex: 0,
+      claimed: 0,
+      source: 0,
+      overage: 0,
+      weight: 0.15,
     }))
   }, [mesh])
 
@@ -238,6 +270,8 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
     let okIdx = 0
     let badIdx = 0
 
+    const maxOverage = Math.max(1, ...ls.map((l) => l.overage))
+    const maxClaim = Math.max(1, ...ls.map((l) => Math.abs(l.claimed)))
     movablesRef.current = movablesRef.current.map((m) => {
       const line = ls[m.id % ls.length]
       const ok = line.ok
@@ -246,20 +280,36 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
         ? Math.max(okCount, 1) * Math.ceil(NODE_COUNT / ls.length)
         : Math.max(badCount, 1) * Math.ceil(NODE_COUNT / ls.length)
       const focus = ok ? FOCUS_GRANT : FOCUS_REFUSE
-      // scramble: explode off the peak (symmetry break)
+      // DATA weight: overage magnitude (REFUSE) or how close to ceiling (GRANT)
+      const weight = ok
+        ? 0.2 + 0.55 * (1 - Math.min(1, line.claimed / Math.max(line.source, 1e-6)))
+        : 0.35 + 0.65 * Math.min(1, line.overage / maxOverage)
+      // scramble: explode off the peak — radius/speed from data weight
       const burstAng = m.theta + (hash(m.id, sortKey) - 0.5) * 1.8
-      const burstR = 18 + hash(m.id, sortKey + 3) * 48
+      const burstR = 14 + weight * 52 + hash(m.id, sortKey + 3) * 18
       const scramble = {
         x: CX + Math.cos(burstAng) * burstR + (hash(m.id, 8) - 0.5) * 12,
         y: CY + Math.sin(burstAng) * burstR * 0.72 - 8,
       }
       const target = focusCluster(focus, idx, Math.max(nSide, 8))
+      // heavier overage → cluster farther out (more mass in the refuse cloud)
+      if (!ok) {
+        const push = 1 + weight * 0.55
+        target.x = focus.x + (target.x - focus.x) * push
+        target.y = focus.y + (target.y - focus.y) * push
+      }
+      void maxClaim
       return {
         ...m,
         ok,
         scramble,
         ctrl: generatorCtrl(scramble, focus, m.id + sortKey),
         target,
+        lineIndex: line.index,
+        claimed: line.claimed,
+        source: line.source,
+        overage: line.overage,
+        weight,
       }
     })
 
@@ -356,9 +406,43 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
             const p = qBez(m.scramble, m.ctrl, m.target, t)
             el.setAttribute('cx', String(p.x))
             el.setAttribute('cy', String(p.y))
-            el.setAttribute('r', String(2.2 - t * 0.35))
+            el.setAttribute('r', String((1.4 + m.weight * 2.2) * (1 - t * 0.15)))
             el.setAttribute('fill', m.ok ? '#3dfff0' : '#ff6b8a')
             el.setAttribute('opacity', String(0.78 + t * 0.22))
+            el.setAttribute('data-line', String(m.lineIndex))
+            el.setAttribute('data-overage', String(m.overage))
+            el.setAttribute('data-weight', m.weight.toFixed(3))
+          }
+          // Spider-web fibers: connect nodes that share lineIndex (same data unit)
+          const fiberG = svgRef.current?.querySelector('.fiber-web') as SVGGElement | null
+          if (fiberG) {
+            const byLine = new Map<number, { x: number; y: number; w: number; ok: boolean }[]>()
+            for (let i = 0; i < movables.length; i++) {
+              const m = movables[i]
+              const el = els[i]
+              if (!el) continue
+              const x = Number(el.getAttribute('cx'))
+              const y = Number(el.getAttribute('cy'))
+              const arr = byLine.get(m.lineIndex) ?? []
+              arr.push({ x, y, w: m.weight, ok: m.ok })
+              byLine.set(m.lineIndex, arr)
+            }
+            let html = ''
+            byLine.forEach((pts) => {
+              if (pts.length < 2) return
+              const w = pts[0].w
+              const stroke = pts[0].ok
+                ? `rgba(61,255,240,${0.15 + w * 0.45})`
+                : `rgba(255,107,138,${0.18 + w * 0.5})`
+              const sw = 0.35 + w * 1.4
+              for (let a = 0; a < pts.length; a++) {
+                for (let b = a + 1; b < pts.length; b++) {
+                  if ((a + b + pts.length) % 3 !== 0 && pts.length > 3) continue
+                  html += `<line x1="${pts[a].x}" y1="${pts[a].y}" x2="${pts[b].x}" y2="${pts[b].y}" stroke="${stroke}" stroke-width="${sw}" opacity="${0.35 + t * 0.5}" />`
+                }
+              }
+            })
+            fiberG.innerHTML = html
           }
           if (coreSubRef.current) coreSubRef.current.textContent = 'VACUUM…'
           if (coreLabelRef.current) {
@@ -437,6 +521,8 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
           nextPhase = 'idle'
           svgRef.current?.removeAttribute('data-sorting')
           nodesRef.current?.setAttribute('data-phase', 'idle')
+          const fiberG = svgRef.current?.querySelector('.fiber-web') as SVGGElement | null
+          if (fiberG) fiberG.innerHTML = ''
           if (coreRingRef.current) coreRingRef.current.setAttribute('stroke', 'url(#meshLine)')
           if (geomRef.current) geomRef.current.setAttribute('opacity', '0.28')
           for (let i = 0; i < els.length; i++) {
@@ -599,28 +685,7 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
           strokeWidth="0.55"
           fill="rgba(255,107,138,0.08)"
         />
-        <text
-          x={FOCUS_GRANT.x}
-          y={FOCUS_GRANT.y - 6}
-          textAnchor="middle"
-          className="focus-label"
-          fill="rgba(61,255,240,0.55)"
-          fontSize="4.5"
-          fontFamily="ui-monospace, monospace"
-        >
-          F
-        </text>
-        <text
-          x={FOCUS_REFUSE.x}
-          y={FOCUS_REFUSE.y - 6}
-          textAnchor="middle"
-          className="focus-label"
-          fill="rgba(255,107,138,0.5)"
-          fontSize="4.5"
-          fontFamily="ui-monospace, monospace"
-        >
-          F′
-        </text>
+        {/* foci stay geometric; no costume letter labels — buckets are data clusters */}
       </g>
 
       {Array.from({ length: DUST }, (_, i) => {
@@ -693,6 +758,8 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null }:
           )
         })}
       </g>
+
+      <g className="fiber-web" aria-hidden />
 
       <g ref={nodesRef} filter="url(#sortGlow)" className="dendrite-sort-nodes" data-phase="idle">
         {mesh.homes.map((p, i) => (

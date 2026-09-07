@@ -52,6 +52,7 @@ export default function App() {
     lines: LineDelta[]
     verdict: Verdict
   } | null>(null)
+  const [fiberEvidence, setFiberEvidence] = useState<LineDelta | null>(null)
   const metrics = useLiveMetrics(5220 + ledger.length)
 
   const onSort = useCallback((entry: LedgerEntry) => {
@@ -69,6 +70,7 @@ export default function App() {
       lines: entry.result.lines,
       verdict: entry.verdict,
     })
+    setFiberEvidence(null)
   }, [])
 
   const lastVerdict = ledger[0]?.verdict ?? sortViz?.verdict ?? null
@@ -110,7 +112,16 @@ export default function App() {
               sortKey={sortViz?.key ?? 0}
               lines={sortViz?.lines}
               verdict={sortViz?.verdict ?? null}
+              onFiberClick={(line) => setFiberEvidence(line)}
             />
+            {fiberEvidence ? (
+              <p className="fiber-evidence" role="status">
+                fiber L{fiberEvidence.index + 1}: C={fiberEvidence.claimed} S={fiberEvidence.source}
+                {fiberEvidence.ok
+                  ? ' · C≤S'
+                  : ` · over +${fiberEvidence.overage}`}
+              </p>
+            ) : null}
           </div>
         </section>
 
