@@ -2002,3 +2002,77 @@
   border-style: solid;
   border-color: var(--line-strong);
 }
+
+/* Klaus Drive ring — structure (Visual CSS polish later) */
+.kring {
+  margin: 0.75rem 0 1.1rem;
+}
+.kring-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: minmax(240px, 340px) 1fr;
+  align-items: start;
+}
+@media (max-width: 720px) {
+  .kring-grid { grid-template-columns: 1fr; }
+}
+.pring {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  position: relative;
+}
+.pring-svg { display: block; }
+.pring-node { color: #8aa4b8; }
+.pring-node.lit { color: #3dfff0; }
+.pring-node.done { color: #5dff9a; }
+.pring-node.partial { color: #ffb020; }
+.pring-node.hold { color: #b44dff; }
+.pring-node.active { color: #e8f7ff; }
+.pring-node-label { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; }
+.pring-node-sub { font-size: 7px; letter-spacing: 0.08em; opacity: 0.85; }
+.pring-core-kicker { font-size: 8px; letter-spacing: 0.14em; }
+.pring-core-num { font-size: 18px; font-weight: 700; }
+.pring-core-unit { font-size: 8px; letter-spacing: 0.08em; }
+.kring-panel { padding: 0.75rem 0.85rem; }
+.kring-crumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0 0 0.65rem;
+  padding: 0;
+}
+.kring-crumb-btn {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.45rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: transparent;
+  color: rgba(180,200,230,0.65);
+  cursor: pointer;
+  min-height: 36px;
+}
+.kring-crumb-btn.lit { border-color: rgba(61,255,240,0.35); color: #9ef5e8; }
+.kring-crumb-btn.on {
+  border-color: rgba(61,255,240,0.55);
+  color: #e8f7ff;
+  background: rgba(61,255,240,0.1);
+}
+.kring-detail h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+.kring-detail ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.82rem;
+  color: #c8d6f0;
+}
+.kring-locks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.75rem;
+}

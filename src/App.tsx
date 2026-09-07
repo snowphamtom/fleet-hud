@@ -1,288 +1,352 @@
-import { useCallback, useState } from 'react'
-import type { FiberNode, FiberSort } from './lib/fiber'
-import type { Verdict } from './lib/sort'
-import { DendriteRing } from './components/DendriteRing'
-import { FiberEvidence } from './components/FiberEvidence'
-import { GrokStub } from './components/GrokStub'
-import { HudBar } from './components/HudBar'
+import { useMemo, useState } from 'react'
+import { ProcessRing, useRingLightUp, type StageId } from './components/ProcessRing'
 import { InstallHint } from './components/InstallHint'
-import { SortingDemo, type LedgerEntry } from './components/SortingDemo'
-import { StagePanels } from './components/StagePanels'
-import { useLiveMetrics } from './hooks/useLiveMetrics'
 import { ALL_GAS } from './lib/config'
-import type { Stage } from './lib/config'
+import snapJson from './data/processSnapshot.json'
+import type { ProcessSnapshot } from './data/processTypes'
 import './App.css'
 
-const EMPTY_COUNTS: Record<Stage, number> = {
-  Intake: 0,
-  Filter: 0,
-  Evidence: 0,
-  Verdict: 0,
-  Store: 0,
+const SNAP = snapJson as ProcessSnapshot
+
+function StageDetail({ id, snap }: { id: StageId; snap: ProcessSnapshot }) {
+  if (id === 'mara') {
+    const m = snap.mara
+    return (
+      <article className="detail" data-stage="mara">
+        <header>
+          <span className="tag done">DONE</span>
+          <h2>MARA — Drive inventory</h2>
+          <p className="role">{m.role} · {m.bot} · measured {m.measured}</p>
+        </header>
+        <div className="stat-grid">
+          <div className="stat">
+            <span className="stat-n">{m.rootFolders}</span>
+            <span className="stat-l">root folders</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{m.looseFilesClaim}</span>
+            <span className="stat-l">loose files</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{m.introOutroChildren}</span>
+            <span className="stat-l">intro-outro kids</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{m.rootTotalClaimed}</span>
+            <span className="stat-l">root claimed</span>
+          </div>
+        </div>
+        <p className="note">Shelves 00–08 present · claimed ≤ interior · scan only</p>
+        <div className="chips">{m.artifacts.map((a) => <span key={a}>{a}</span>)}</div>
+      </article>
+    )
+  }
+  if (id === 'cole') {
+    const c = snap.cole
+    return (
+      <article className="detail" data-stage="cole">
+        <header>
+          <span className="tag done">DONE</span>
+          <h2>COLE — PROPOSE pack</h2>
+          <p className="role">{c.role} · {c.bot}</p>
+        </header>
+        <div className="stat-grid">
+          <div className="stat highlight">
+            <span className="stat-n">{c.proposeRows}</span>
+            <span className="stat-l">rows in index.md</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{c.packA}</span>
+            <span className="stat-l">Pack A optic</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{c.packB}</span>
+            <span className="stat-l">Pack B → 07</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{c.packC}</span>
+            <span className="stat-l">Pack C → 08</span>
+          </div>
+        </div>
+        <p className="note">{c.law}</p>
+        <div className="chips">{c.artifacts.map((a) => <span key={a}>{a}</span>)}</div>
+      </article>
+    )
+  }
+  if (id === 'rina') {
+    const r = snap.rina
+    return (
+      <article className="detail" data-stage="rina">
+        <header>
+          <span className="tag done">DONE</span>
+          <h2>RINA — plates / intro-outro</h2>
+          <p className="role">{r.role} · {r.bot}</p>
+        </header>
+        <div className="stat-grid">
+          <div className="stat highlight">
+            <span className="stat-n">{r.introOutroIntact ? 'INTACT' : '—'}</span>
+            <span className="stat-l">intro-outro</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{r.stayOptics}</span>
+            <span className="stat-l">stay optics</span>
+          </div>
+          <div className="stat">
+            <span className="stat-n">{r.propose07}</span>
+            <span className="stat-l">propose → 07</span>
+          </div>
+        </div>
+        <p className="note">{r.boundary} · id {r.introOutroId.slice(0, 12)}…</p>
+        <div className="chips">{r.artifacts.map((a) => <span key={a}>{a}</span>)}</div>
+      </article>
+    )
+  }
+  if (id === 'vince') {
+    const v = snap.vince
+    return (
+      <article className="detail" data-stage="vince">
+        <header>
+          <span className="tag hold">GATE</span>
+          <h2>VINCE — holds board</h2>
+          <p className="role">{v.role} · {v.bot} · execute only {v.gate}</p>
+        </header>
+        <div className="hold-cols">
+          <div>
+            <h3>Executed</h3>
+            <ul>
+              {v.executed.map((e) => (
+                <li key={e.id}>
+                  <span className="kw done">DONE</span> {e.id} → {e.dest}
+                  <em>{e.label}</em>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>Pending</h3>
+            <ul>
+              {v.pending.map((p) => (
+                <li key={p.id}>
+                  <span className="kw pend">{p.kind}</span> {p.id}
+                  <em>{p.why}</em>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className="chips">{v.artifacts.map((a) => <span key={a}>{a}</span>)}</div>
+      </article>
+    )
+  }
+  const x = snap.execute
+  return (
+    <article className="detail" data-stage="execute">
+      <header>
+        <span className="tag partial">PARTIAL</span>
+        <h2>EXECUTE — moves</h2>
+        <p className="role">{x.when} · metadata parent moves only</p>
+      </header>
+      <div className="stat-grid">
+        <div className="stat highlight">
+          <span className="stat-n">{x.plates07.moved}→07</span>
+          <span className="stat-l">plates-07 DONE</span>
+        </div>
+        <div className="stat highlight">
+          <span className="stat-n">{x.archival08.moved}→08</span>
+          <span className="stat-l">archival-08 DONE</span>
+        </div>
+        <div className="stat">
+          <span className="stat-n">{x.totalMoves}</span>
+          <span className="stat-l">total moves</span>
+        </div>
+        <div className="stat">
+          <span className="stat-n">{x.totalFail}</span>
+          <span className="stat-l">fail</span>
+        </div>
+      </div>
+      <p className="note">
+        archival-08 = named {x.archival08.breakdown.named} + IMG {x.archival08.breakdown.img} +
+        UUID {x.archival08.breakdown.uuid} + misc {x.archival08.breakdown.misc}
+      </p>
+      <div className="pending-strip">
+        <span>PENDING</span>
+        {x.pendingGates.map((g) => (
+          <code key={g}>{g}</code>
+        ))}
+      </div>
+      <div className="chips">{x.artifacts.map((a) => <span key={a}>{a}</span>)}</div>
+    </article>
+  )
 }
 
-const ACCESS = [
-  { name: 'mail', pct: 86 },
-  { name: 'calendar', pct: 62 },
-  { name: 'drive', pct: 74 },
-  { name: 'contacts', pct: 41 },
-  { name: 'billing', pct: 28 },
-] as const
-
-const BOTS = [
-  { name: 'SCOUT', state: 'run' as const },
-  { name: 'PATCH', state: 'run' as const },
-  { name: 'PROXY', state: 'run' as const },
-  { name: 'CLOSE', state: 'idle' as const },
-  { name: 'DROP', state: 'idle' as const },
-  { name: 'BELL', state: 'idle' as const },
-]
-
-const RUN_SEED = [
-  { t: 'init: fork subdevice', kw: 'new', n: '01' },
-  { t: 'auth: remote added', kw: 'granted', n: '02' },
-  { t: 'action: follow-up', kw: 'new', n: '03' },
-  { t: 'event: grant init', kw: 'granted', n: '04' },
-  { t: 'trace: prefer-live', kw: 'new', n: '05' },
-] as const
-
 export default function App() {
-  const [ledger, setLedger] = useState<LedgerEntry[]>([])
-  const [stageCounts, setStageCounts] = useState(EMPTY_COUNTS)
-  const [sortViz, setSortViz] = useState<{
-    key: number
-    fiber: FiberSort
-    verdict: Verdict
-  } | null>(null)
-  const [fiberEvidence, setFiberEvidence] = useState<FiberNode | null>(null)
-  const metrics = useLiveMetrics(5220 + ledger.length)
+  const [active, setActive] = useState<StageId>('execute')
+  const litThrough = useRingLightUp(5, 480)
+  const convexOk = ALL_GAS.convex.configured
 
-  const onSort = useCallback((entry: LedgerEntry) => {
-    setLedger((prev) => [entry, ...prev].slice(0, 24))
-    setStageCounts((prev) => ({
-      Intake: prev.Intake + 1,
-      Filter: prev.Filter + 1,
-      Evidence: prev.Evidence + 1,
-      Verdict: prev.Verdict + 1,
-      Store: prev.Store + 1,
-    }))
-    // Drive torus node scramble → GRANT/REFUSE cluster migration
-    setSortViz({
-      key: Date.now(),
-      fiber: entry.fiber,
-      verdict: entry.verdict,
-    })
-    setFiberEvidence(null)
-  }, [])
-
-  const lastVerdict = ledger[0]?.verdict ?? sortViz?.verdict ?? null
+  const pipeline = useMemo(
+    () =>
+      [
+        { id: 'mara' as const, label: 'MARA', metric: `${SNAP.mara.rootFolders} folders` },
+        { id: 'cole' as const, label: 'COLE', metric: `${SNAP.cole.proposeRows} propose` },
+        { id: 'rina' as const, label: 'RINA', metric: 'intro-outro OK' },
+        { id: 'vince' as const, label: 'VINCE', metric: `${SNAP.vince.pending.length} pending` },
+        {
+          id: 'execute' as const,
+          label: 'EXECUTE',
+          metric: `${SNAP.execute.totalMoves} moves`,
+        },
+      ] as const,
+    [],
+  )
 
   return (
-    <div className="app">
-      <HudBar actions={metrics.actions} hits={metrics.hits} live />
+    <div className="app dark-hud">
+      <header className="topbar">
+        <div className="brand">
+          <span className="pulse-dot" aria-hidden />
+          <div>
+            <div className="brand-kicker">// KLAUS DRIVE RING</div>
+            <div className="brand-title">Fleet HUD · PROCESS</div>
+          </div>
+        </div>
+        <div className="top-meta">
+          <span className="pill">{convexOk ? 'CONVEX live' : 'CONVEX off'}</span>
+          <span className="pill mute">{SNAP.stampLabel}</span>
+        </div>
+      </header>
 
       <main className="shell">
         <section className="hero">
           <div className="hero-copy">
-            <div className="eyebrow">// FLEET HUD</div>
-            <h1>Sorting Machine</h1>
+            <h1>Drive process</h1>
             <p>
-              One law: claimed ≤ source on every line → bucket GRANT or REFUSE. Phone-first
-              installable shell for the All Gas stack.
+              Mara scan → Cole PROPOSE → Rina plates → Vince <code>approve[id]</code> gate →
+              Execute. Forensic snapshot of the run Taylor just closed.
             </p>
-            <div className="stack-chips">
-              <span className="pill">{ALL_GAS.convex.configured ? 'CONVEX live' : 'CONVEX'}</span>
-              <span className="pill">FIRECRAWL</span>
-              <span className="pill">AGENTMAIL</span>
-              <span className="pill">GROK stub</span>
+            <div className="hero-nums">
+              <div>
+                <strong>{SNAP.mara.rootFolders}</strong>
+                <span>root folders</span>
+              </div>
+              <div>
+                <strong>{SNAP.cole.proposeRows}</strong>
+                <span>propose rows</span>
+              </div>
+              <div>
+                <strong>{SNAP.execute.totalMoves}</strong>
+                <span>moves · 0 fail</span>
+              </div>
+              <div>
+                <strong>{SNAP.vince.pending.length}</strong>
+                <span>gates open</span>
+              </div>
             </div>
-            <a
-              className="card-chip"
-              href={ALL_GAS.card}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              Card → vibeapps.dev/s/ceilinggate-1
-            </a>
           </div>
           <div className="hero-viz">
-            <span className="hero-float a">SUBNET_004</span>
-            <span className="hero-float b">ACTIVE_CORE</span>
-            <span className="hero-float c">TRACE_002</span>
-            <DendriteRing
-              size={292}
-              sortKey={sortViz?.key ?? 0}
-              fiberSort={sortViz?.fiber ?? null}
-              verdict={sortViz?.verdict ?? null}
-              onFiberClick={(node) => setFiberEvidence(node)}
-            />
-            <FiberEvidence
-              node={fiberEvidence}
-              onClose={() => setFiberEvidence(null)}
+            <ProcessRing
+              snap={SNAP}
+              active={active}
+              onSelect={setActive}
+              litThrough={litThrough}
             />
           </div>
         </section>
 
+        <nav className="pipeline" aria-label="Process stages">
+          {pipeline.map((s, i) => {
+            const lit = i < litThrough
+            return (
+              <button
+                key={s.id}
+                type="button"
+                className={`pipe-stage ${active === s.id ? 'active' : ''} ${lit ? 'lit' : ''}`}
+                onClick={() => setActive(s.id)}
+              >
+                <span className="pipe-idx">{String(i + 1).padStart(2, '0')}</span>
+                <span className="pipe-label">{s.label}</span>
+                <span className="pipe-metric">{s.metric}</span>
+              </button>
+            )
+          })}
+        </nav>
 
-        <section className="judge-dock" id="judge-dock" aria-label="Judge path">
-          <StagePanels
-            pulse={metrics.stagePulse}
-            metrics={metrics}
-            stageCounts={stageCounts}
-            fiberSort={sortViz?.fiber ?? null}
-          />
-          <SortingDemo ledger={ledger} onSort={onSort} />
-          <div className="result-strip" id="result-stamp" aria-live="polite">
-            <span>// RESULT STAMP</span>
-            {lastVerdict ? (
-              <span className={`stamp ${lastVerdict.toLowerCase()}`}>{lastVerdict}</span>
-            ) : (
-              <span>awaiting Demo GRANT / REFUSE</span>
-            )}
+        <StageDetail id={active} snap={SNAP} />
+
+        <section className="locks panel">
+          <div className="section-label">
+            <span className="section-title">// LOCKS</span>
+            <span className="section-value">fail-closed</span>
+          </div>
+          <div className="lock-row">
+            {SNAP.locks.map((l) => (
+              <span key={l} className="lock-chip">
+                {l}
+              </span>
+            ))}
           </div>
         </section>
 
-        {/* FUI modular status chrome — client demo only */}
-        <section className="fleet-modules" aria-label="Fleet status modules">
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// RUN LOG</span>
-              <span className="section-value">{metrics.actions.toLocaleString()}</span>
+        <section className="board panel">
+          <div className="section-label">
+            <span className="section-title">// EXECUTE SUMMARY</span>
+            <span className="section-value">56 OK</span>
+          </div>
+          <div className="board-grid">
+            <div className="board-card done">
+              <span className="bc-k">plates-07</span>
+              <span className="bc-v">13 → 07</span>
+              <span className="bc-s">MTP · FIG · GRIMM keep · cover</span>
             </div>
-            <ul className="run-log">
-              {RUN_SEED.map((row) => (
-                <li key={row.n}>
-                  <span>
-                    <span className={`kw ${row.kw === 'granted' ? 'grant' : 'new'}`}>{row.kw}</span>{' '}
-                    {row.t}
-                  </span>
-                  <span className="n">{row.n}</span>
-                </li>
-              ))}
-              {ledger.slice(0, 3).map((e) => (
-                <li key={e.id}>
-                  <span>
-                    <span className={`kw ${e.verdict === 'GRANT' ? 'grant' : ''}`}>
-                      {e.verdict.toLowerCase()}
-                    </span>{' '}
-                    {e.label.slice(0, 28)}
-                  </span>
-                  <span className="n">{e.result.lines.length}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// ACCESS LEDGER</span>
+            <div className="board-card done">
+              <span className="bc-k">archival-08</span>
+              <span className="bc-v">43 → 08</span>
+              <span className="bc-s">glass dups · IMG wave · UUID PNGs</span>
             </div>
-            <div className="access-rows">
-              {ACCESS.map((row) => (
-                <div key={row.name} className="access-row">
-                  <span>{row.name}</span>
-                  <div className="bar-track">
-                    <div className="bar-fill" style={{ width: `${row.pct}%` }} />
-                  </div>
-                </div>
-              ))}
+            <div className="board-card pend">
+              <span className="bc-k">H-IO-GATE</span>
+              <span className="bc-v">KEEP</span>
+              <span className="bc-s">intro-outro leave intact</span>
             </div>
-            <div className="panel-foot">6 days reachable from one login</div>
-          </article>
-
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// BLAST RADIUS</span>
+            <div className="board-card pend">
+              <span className="bc-k">H-SWEEP-DUP</span>
+              <span className="bc-v">TRASH?</span>
+              <span className="bc-s">needs named approve + byte-check</span>
             </div>
-            <div className="blast">
-              <div className="blast-gauge" aria-hidden>
-                <span className="blast-num">3</span>
-              </div>
-              <div className="blast-copy">
-                any stuck machine stops every bot · entering a bot leaves the session
-              </div>
-            </div>
-          </article>
-
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// ACTION HEAT</span>
-            </div>
-            <div className="heat-grid" aria-hidden>
-              {Array.from({ length: 128 }, (_, i) => {
-                const base = metrics.heat[i % metrics.heat.length] ?? 0.2
-                // right-side heat cluster (GitHub-style recent activity)
-                const col = i % 16
-                const boost =
-                  col >= 12 ? 0.42 + (col - 12) * 0.12 : col >= 8 ? 0.12 : col >= 5 ? 0.02 : -0.14
-                const v = Math.min(1, Math.max(0.05, base * 0.5 + boost + ((i * 17) % 9) * 0.025))
-                const cool = v < 0.2
-                return (
-                  <span
-                    key={i}
-                    style={{
-                      background: cool
-                        ? `rgba(10,22,44,${0.06 + v * 0.14})`
-                        : `linear-gradient(135deg, rgba(0,212,255,${0.28 + v * 0.72}), rgba(138,61,255,${0.16 + v * 0.62}))`,
-                      boxShadow: cool ? undefined : '0 0 4px rgba(0,212,255,0.18)',
-                    }}
-                  />
-                )
-              })}
-            </div>
-          </article>
-
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// THROUGHPUT</span>
-              <span className="section-value">{metrics.throughput}/s</span>
-            </div>
-            <div className="thru-bars" aria-hidden>
-              {Array.from({ length: 36 }, (_, i) => {
-                const v = metrics.bars[i % metrics.bars.length] ?? 0.4
-                const jag = 0.5 + 0.5 * Math.sin(i * 1.55) * Math.cos(i * 0.62)
-                const h = Math.min(1, Math.max(0.1, v * jag))
-                return <span key={i} style={{ height: `${Math.round(h * 100)}%` }} />
-              })}
-            </div>
-            <div className="thru-pulse" aria-hidden />
-            <div className="panel-foot">
-              route health {metrics.routeHealth}% · // trace sync
-            </div>
-          </article>
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// BOT STATUS</span>
-              <span className="section-value">3/6</span>
-            </div>
-            <ul className="bot-list">
-              {BOTS.map((b) => (
-                <li key={b.name} className={`bot-row ${b.state}`}>
-                  <span className="name">{b.name}</span>
-                  <span className="bot-segs" aria-hidden>
-                    <i />
-                    <i />
-                    <i />
-                    <i />
-                  </span>
-                  <span className="bot-state">{b.state}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-
+          </div>
         </section>
-
 
         <div className="bottom-grid">
-          <GrokStub />
+          <article className="panel wire">
+            <div className="section-label">
+              <span className="section-title">// WIRE</span>
+            </div>
+            <ul className="wire-list">
+              <li>
+                <span>Convex</span>
+                <code>{convexOk ? 'fleet-gerbil-682' : 'unconfigured'}</code>
+              </li>
+              <li>
+                <span>Drive</span>
+                <code>{SNAP.drive}</code>
+              </li>
+              <li>
+                <span>Snapshot</span>
+                <code>embedded JSON</code>
+              </li>
+              <li>
+                <span>Ring</span>
+                <code>{SNAP.ring}</code>
+              </li>
+            </ul>
+          </article>
           <InstallHint />
         </div>
       </main>
 
       <footer className="foot">
-        <span>// prefer A · no redirect · HOLD FILE on vibeapps</span>
-        <span>fleet-hud · offline-ready PWA</span>
+        <span>// dark forensic · not light FUI · claimed ≤ interior</span>
+        <span>snowphamtom/fleet-hud · PWA</span>
       </footer>
     </div>
   )
