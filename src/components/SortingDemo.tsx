@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { buildFiberSort, type FiberSort } from '../lib/fiber'
 import {
   DEMO_GRANT,
   DEMO_REFUSE,
@@ -15,6 +16,8 @@ export type LedgerEntry = {
   label: string
   verdict: Verdict
   result: SortResult
+  /** Numbers-first spider web — drives torus clusters / fiber edges */
+  fiber: FiberSort
 }
 
 type Props = {
@@ -49,6 +52,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
       label,
       verdict: result.verdict,
       result,
+      fiber: buildFiberSort(claimed, source, { kind: 'demo', labelPrefix: 'L' }),
     })
   }
 
@@ -141,6 +145,17 @@ export function SortingDemo({ ledger, onSort }: Props) {
                 <b>{line.ok ? 'C≤S' : `+${line.overage}`}</b>
               </div>
             ))}
+            {(() => {
+              const src = last ?? preview
+              if (!src) return null
+              const fiber = buildFiberSort(src.claimed, src.source, { kind: 'demo' })
+              return (
+                <div className="fiber-meta panel-foot">
+                  fiber · G={fiber.grantIds.length} R={fiber.refuseIds.length} ·{' '}
+                  {fiber.edges.length} edges (residual)
+                </div>
+              )
+            })()}
           </div>
         )}
       </article>

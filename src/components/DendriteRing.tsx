@@ -6,6 +6,13 @@
  * of the plane∩cone ellipse. Phone-ok rAF + SVG attr mutation.
  */
 import { useEffect, useMemo, useRef } from 'react'
+import {
+  fiberSortFromLines,
+  isGrantNode,
+  residualOf,
+  type FiberNode,
+  type FiberSort,
+} from '../lib/fiber'
 import type { LineDelta, Verdict } from '../lib/sort'
 
 type Pt = { x: number; y: number; z: number; u: number; v: number }
@@ -16,10 +23,13 @@ type Props = {
   size?: number
   /** Bumps on every Demo GRANT / REFUSE / SORT to restart the animation. */
   sortKey?: number
+  /** Preferred: FiberSort graph — numbers drive clusters + edge residuals. */
+  fiberSort?: FiberSort | null
+  /** Fallback when FiberSort not passed (legacy LineDelta[]). */
   lines?: LineDelta[]
   verdict?: Verdict | null
-  /** Click a sorted fiber node → evidence (line data), not a costume label. */
-  onFiberClick?: (line: LineDelta) => void
+  /** Click a sorted fiber node → evidence from FiberNode data, not a costume label. */
+  onFiberClick?: (node: FiberNode) => void
 }
 
 const CX = 100
@@ -108,12 +118,15 @@ type Movable = {
   ok: boolean
   /** Angle on idle ring for Goldstone tangential drift */
   theta: number
+  /** Bound FiberNode id — edges + click evidence key off this */
+  fiberId: string
   /** Bound sort-line data (C/S/overage) — drives weight/speed/color, not labels */
   lineIndex: number
   claimed: number
   source: number
   overage: number
-  /** 0..1 normalized data weight from overage / claimed */
+  residual: number
+  /** 0..1 normalized data weight from |residual| / claimed */
   weight: number
 }
 
@@ -201,7 +214,7 @@ function generatorCtrl(
   }
 }
 
-export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, onFiberClick }: Props) {
+export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines, verdict = null, onFiberClick }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const latticeRef = useRef<SVGGElement>(null)
   const nodesRef = useRef<SVGGElement>(null)
@@ -212,6 +225,7 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
   const sortStartRef = useRef<number>(0)
   const lastSortKey = useRef(0)
   const linesRef = useRef<LineDelta[] | undefined>(lines)
+  const fiberSortRef = useRef<FiberSort | null>(fiberSort ?? null)
   const verdictRef = useRef(verdict)
   const coreLabelRef = useRef<SVGTextElement>(null)
   const coreSubRef = useRef<SVGTextElement>(null)
@@ -221,21 +235,39 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
 
   useEffect(() => {
     linesRef.current = lines
+    fiberSortRef.current = fiberSort ?? null
     verdictRef.current = verdict
-  }, [lines, verdict])
+  }, [lines, fiberSort, verdict])
 
   useEffect(() => {
     const root = nodesRef.current
     if (!root || !onFiberClick) return
     const onClick = (ev: MouseEvent) => {
-      const t = ev.target as Element | null
-      if (!t || t.tagName !== 'circle') return
-      const lineAttr = t.getAttribute('data-line')
+      const el = ev.target as Element | null
+      if (!el || el.tagName !== 'circle') return
+      const fid = el.getAttribute('data-fiber')
+      const fs = fiberSortRef.current
+      if (fid && fs) {
+        const node = fs.nodes.find((n) => n.id === fid)
+        if (node) {
+          onFiberClick(node)
+          return
+        }
+      }
+      const lineAttr = el.getAttribute('data-line')
       if (lineAttr == null) return
       const lineIndex = Number(lineAttr)
       const ls = linesRef.current
       const line = ls?.find((l) => l.index === lineIndex)
-      if (line) onFiberClick(line)
+      if (line) {
+        onFiberClick({
+          id: `line-${line.index}`,
+          label: `L${line.index + 1}`,
+          claimed: line.claimed,
+          source: line.source,
+          kind: 'line',
+        })
+      }
     }
     root.addEventListener('click', onClick)
     root.style.cursor = 'pointer'
@@ -251,10 +283,12 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
       target: { x: home.x, y: home.y },
       ok: true,
       theta: (id / NODE_COUNT) * Math.PI * 2,
+      fiberId: '',
       lineIndex: 0,
       claimed: 0,
       source: 0,
       overage: 0,
+      residual: 0,
       weight: 0.15,
     }))
   }, [mesh])
@@ -262,29 +296,39 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
   useEffect(() => {
     if (!sortKey || sortKey === lastSortKey.current) return
     lastSortKey.current = sortKey
-    const ls = linesRef.current
-    if (!ls || ls.length === 0) return
 
-    const okCount = ls.filter((l) => l.ok).length
-    const badCount = ls.length - okCount
+    // Prefer FiberSort graph; fall back to LineDelta[] → FiberSort
+    let fs = fiberSortRef.current
+    if (!fs || fs.nodes.length === 0) {
+      const ls = linesRef.current
+      if (!ls || ls.length === 0) return
+      fs = fiberSortFromLines(ls, 'line')
+      fiberSortRef.current = fs
+    }
+
+    const nodes = fs.nodes
+    const okCount = fs.grantIds.length
+    const badCount = fs.refuseIds.length
     let okIdx = 0
     let badIdx = 0
 
-    const maxOverage = Math.max(1, ...ls.map((l) => l.overage))
-    const maxClaim = Math.max(1, ...ls.map((l) => Math.abs(l.claimed)))
+    const maxAbsRes = Math.max(
+      1,
+      ...nodes.map((n) => Math.abs(residualOf(n))),
+    )
     movablesRef.current = movablesRef.current.map((m) => {
-      const line = ls[m.id % ls.length]
-      const ok = line.ok
+      const node = nodes[m.id % nodes.length]
+      const residual = residualOf(node)
+      const ok = isGrantNode(node)
       const idx = ok ? okIdx++ : badIdx++
       const nSide = ok
-        ? Math.max(okCount, 1) * Math.ceil(NODE_COUNT / ls.length)
-        : Math.max(badCount, 1) * Math.ceil(NODE_COUNT / ls.length)
+        ? Math.max(okCount, 1) * Math.ceil(NODE_COUNT / nodes.length)
+        : Math.max(badCount, 1) * Math.ceil(NODE_COUNT / nodes.length)
       const focus = ok ? FOCUS_GRANT : FOCUS_REFUSE
-      // DATA weight: overage magnitude (REFUSE) or how close to ceiling (GRANT)
+      // DATA weight from residual magnitude (not label text)
       const weight = ok
-        ? 0.2 + 0.55 * (1 - Math.min(1, line.claimed / Math.max(line.source, 1e-6)))
-        : 0.35 + 0.65 * Math.min(1, line.overage / maxOverage)
-      // scramble: explode off the peak — radius/speed from data weight
+        ? 0.2 + 0.55 * (1 - Math.min(1, node.claimed / Math.max(node.source, 1e-6)))
+        : 0.35 + 0.65 * Math.min(1, residual / maxAbsRes)
       const burstAng = m.theta + (hash(m.id, sortKey) - 0.5) * 1.8
       const burstR = 14 + weight * 52 + hash(m.id, sortKey + 3) * 18
       const scramble = {
@@ -292,23 +336,24 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
         y: CY + Math.sin(burstAng) * burstR * 0.72 - 8,
       }
       const target = focusCluster(focus, idx, Math.max(nSide, 8))
-      // heavier overage → cluster farther out (more mass in the refuse cloud)
       if (!ok) {
         const push = 1 + weight * 0.55
         target.x = focus.x + (target.x - focus.x) * push
         target.y = focus.y + (target.y - focus.y) * push
       }
-      void maxClaim
+      const lineIndex = Number.parseInt(node.id.split('-').pop() ?? '0', 10) || 0
       return {
         ...m,
         ok,
         scramble,
         ctrl: generatorCtrl(scramble, focus, m.id + sortKey),
         target,
-        lineIndex: line.index,
-        claimed: line.claimed,
-        source: line.source,
-        overage: line.overage,
+        fiberId: node.id,
+        lineIndex,
+        claimed: node.claimed,
+        source: node.source,
+        overage: ok ? 0 : residual,
+        residual,
         weight,
       }
     })
@@ -413,35 +458,62 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
             el.setAttribute('data-overage', String(m.overage))
             el.setAttribute('data-weight', m.weight.toFixed(3))
           }
-          // Spider-web fibers: connect nodes that share lineIndex (same data unit)
+          // Spider-web from FiberSort.edges — residual drives stroke weight/color
           const fiberG = svgRef.current?.querySelector('.fiber-web') as SVGGElement | null
           if (fiberG) {
-            const byLine = new Map<number, { x: number; y: number; w: number; ok: boolean }[]>()
+            const byId = new Map<string, { x: number; y: number; w: number; ok: boolean }[]>()
             for (let i = 0; i < movables.length; i++) {
               const m = movables[i]
               const el = els[i]
-              if (!el) continue
+              if (!el || !m.fiberId) continue
               const x = Number(el.getAttribute('cx'))
               const y = Number(el.getAttribute('cy'))
-              const arr = byLine.get(m.lineIndex) ?? []
+              const arr = byId.get(m.fiberId) ?? []
               arr.push({ x, y, w: m.weight, ok: m.ok })
-              byLine.set(m.lineIndex, arr)
+              byId.set(m.fiberId, arr)
+              el.setAttribute('data-fiber', m.fiberId)
+              el.setAttribute('data-residual', String(m.residual))
             }
+            const fs = fiberSortRef.current
             let html = ''
-            byLine.forEach((pts) => {
-              if (pts.length < 2) return
-              const w = pts[0].w
-              const stroke = pts[0].ok
-                ? `rgba(61,255,240,${0.15 + w * 0.45})`
-                : `rgba(255,107,138,${0.18 + w * 0.5})`
-              const sw = 0.35 + w * 1.4
-              for (let a = 0; a < pts.length; a++) {
-                for (let b = a + 1; b < pts.length; b++) {
-                  if ((a + b + pts.length) % 3 !== 0 && pts.length > 3) continue
-                  html += `<line x1="${pts[a].x}" y1="${pts[a].y}" x2="${pts[b].x}" y2="${pts[b].y}" stroke="${stroke}" stroke-width="${sw}" opacity="${0.35 + t * 0.5}" />`
+            if (fs && fs.edges.length) {
+              for (const e of fs.edges) {
+                const fromPts = byId.get(e.from)
+                const toPts = byId.get(e.to)
+                if (!fromPts?.length || !toPts?.length) continue
+                const a = fromPts[0]
+                const b = toPts[0]
+                const mag = Math.min(1, Math.abs(e.residual) / 40)
+                const refuse = e.residual > 0
+                const stroke = refuse
+                  ? `rgba(255,107,138,${0.2 + mag * 0.55})`
+                  : `rgba(61,255,240,${0.18 + (1 - mag) * 0.4})`
+                const sw = 0.4 + mag * 1.6 + (a.w + b.w) * 0.35
+                html += `<line data-from="${e.from}" data-to="${e.to}" data-residual="${e.residual}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${stroke}" stroke-width="${sw}" opacity="${0.4 + t * 0.45}" />`
+                // secondary spokes: denser web without costume labels
+                if (fromPts.length > 2 && toPts.length > 2) {
+                  const a2 = fromPts[Math.min(2, fromPts.length - 1)]
+                  const b2 = toPts[Math.min(2, toPts.length - 1)]
+                  html += `<line x1="${a2.x}" y1="${a2.y}" x2="${b2.x}" y2="${b2.y}" stroke="${stroke}" stroke-width="${sw * 0.55}" opacity="${0.22 + t * 0.3}" />`
                 }
               }
-            })
+            } else {
+              // fallback: same-fiberId clique
+              byId.forEach((pts) => {
+                if (pts.length < 2) return
+                const w = pts[0].w
+                const stroke = pts[0].ok
+                  ? `rgba(61,255,240,${0.15 + w * 0.45})`
+                  : `rgba(255,107,138,${0.18 + w * 0.5})`
+                const sw = 0.35 + w * 1.4
+                for (let a = 0; a < pts.length; a++) {
+                  for (let b = a + 1; b < pts.length; b++) {
+                    if ((a + b + pts.length) % 3 !== 0 && pts.length > 3) continue
+                    html += `<line x1="${pts[a].x}" y1="${pts[a].y}" x2="${pts[b].x}" y2="${pts[b].y}" stroke="${stroke}" stroke-width="${sw}" opacity="${0.35 + t * 0.5}" />`
+                  }
+                }
+              })
+            }
             fiberG.innerHTML = html
           }
           if (coreSubRef.current) coreSubRef.current.textContent = 'VACUUM…'
@@ -479,6 +551,9 @@ export function DendriteRing({ size = 240, sortKey = 0, lines, verdict = null, o
             el.setAttribute('r', '1.9')
             el.setAttribute('fill', m.ok ? '#3dfff0' : '#ff6b8a')
             el.setAttribute('opacity', '0.98')
+            if (m.fiberId) el.setAttribute('data-fiber', m.fiberId)
+            el.setAttribute('data-line', String(m.lineIndex))
+            el.setAttribute('data-residual', String(m.residual))
           }
           if (coreLabelRef.current) {
             coreLabelRef.current.textContent = verdictRef.current ?? 'C ≤ S'

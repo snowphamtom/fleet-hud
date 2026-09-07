@@ -1,4 +1,5 @@
 import { STAGES, type Stage } from '../lib/config'
+import type { FiberSort } from '../lib/fiber'
 import { SectionLabel } from './SectionLabel'
 
 type Props = {
@@ -10,6 +11,8 @@ type Props = {
     bars: number[]
   }
   stageCounts: Record<Stage, number>
+  /** Last FiberSort — GRANT/REFUSE counts from C/S data */
+  fiberSort?: FiberSort | null
 }
 
 const STAGE_HINT: Record<Stage, string> = {
@@ -20,7 +23,7 @@ const STAGE_HINT: Record<Stage, string> = {
   Store: 'vault + live board',
 }
 
-export function StagePanels({ pulse, metrics, stageCounts }: Props) {
+export function StagePanels({ pulse, metrics, stageCounts, fiberSort }: Props) {
   return (
     <section className="stage-grid" aria-label="Sorting stages">
       {STAGES.map((stage, i) => {
@@ -55,6 +58,13 @@ export function StagePanels({ pulse, metrics, stageCounts }: Props) {
         </div>
         <div className="panel-foot">
           route health {metrics.routeHealth}% · // prefer-live
+          {fiberSort ? (
+            <>
+              {' '}
+              · fiber G={fiberSort.grantIds.length} R={fiberSort.refuseIds.length} ·{' '}
+              {fiberSort.edges.length}e
+            </>
+          ) : null}
         </div>
       </article>
     </section>

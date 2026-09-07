@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
-import type { LineDelta, Verdict } from './lib/sort'
+import type { FiberNode, FiberSort } from './lib/fiber'
+import type { Verdict } from './lib/sort'
 import { DendriteRing } from './components/DendriteRing'
 import { GrokStub } from './components/GrokStub'
 import { HudBar } from './components/HudBar'
@@ -49,10 +50,10 @@ export default function App() {
   const [stageCounts, setStageCounts] = useState(EMPTY_COUNTS)
   const [sortViz, setSortViz] = useState<{
     key: number
-    lines: LineDelta[]
+    fiber: FiberSort
     verdict: Verdict
   } | null>(null)
-  const [fiberEvidence, setFiberEvidence] = useState<LineDelta | null>(null)
+  const [fiberEvidence, setFiberEvidence] = useState<FiberNode | null>(null)
   const metrics = useLiveMetrics(5220 + ledger.length)
 
   const onSort = useCallback((entry: LedgerEntry) => {
@@ -67,7 +68,7 @@ export default function App() {
     // Drive torus node scramble → GRANT/REFUSE cluster migration
     setSortViz({
       key: Date.now(),
-      lines: entry.result.lines,
+      fiber: entry.fiber,
       verdict: entry.verdict,
     })
     setFiberEvidence(null)
@@ -110,16 +111,16 @@ export default function App() {
             <DendriteRing
               size={292}
               sortKey={sortViz?.key ?? 0}
-              lines={sortViz?.lines}
+              fiberSort={sortViz?.fiber ?? null}
               verdict={sortViz?.verdict ?? null}
-              onFiberClick={(line) => setFiberEvidence(line)}
+              onFiberClick={(node) => setFiberEvidence(node)}
             />
             {fiberEvidence ? (
               <p className="fiber-evidence" role="status">
-                fiber L{fiberEvidence.index + 1}: C={fiberEvidence.claimed} S={fiberEvidence.source}
-                {fiberEvidence.ok
+                fiber {fiberEvidence.label}: C={fiberEvidence.claimed} S={fiberEvidence.source}
+                {fiberEvidence.claimed <= fiberEvidence.source
                   ? ' · C≤S'
-                  : ` · over +${fiberEvidence.overage}`}
+                  : ` · residual +${fiberEvidence.claimed - fiberEvidence.source}`}
               </p>
             ) : null}
           </div>
@@ -260,6 +261,7 @@ export default function App() {
           pulse={metrics.stagePulse}
           metrics={metrics}
           stageCounts={stageCounts}
+          fiberSort={sortViz?.fiber ?? null}
         />
 
         <SortingDemo ledger={ledger} onSort={onSort} />
