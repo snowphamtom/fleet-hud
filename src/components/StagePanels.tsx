@@ -48,7 +48,7 @@ export function StagePanels({ pulse, metrics, stageCounts }: Props) {
             <span
               key={i}
               style={{
-                background: `linear-gradient(135deg, rgba(0,194,255,${0.15 + v * 0.75}), rgba(122,61,255,${0.1 + v * 0.65}))`,
+                background: `linear-gradient(135deg, rgba(0,212,255,${0.22 + v * 0.75}), rgba(138,61,255,${0.14 + v * 0.65}))`,
               }}
             />
           ))}

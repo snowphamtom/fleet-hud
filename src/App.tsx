@@ -93,7 +93,7 @@ export default function App() {
             <span className="hero-float a">SUBNET_004</span>
             <span className="hero-float b">ACTIVE_CORE</span>
             <span className="hero-float c">TRACE_002</span>
-            <DendriteRing size={268} />
+            <DendriteRing size={280} />
           </div>
         </section>
 
@@ -164,20 +164,22 @@ export default function App() {
               <span className="section-title">// ACTION HEAT</span>
             </div>
             <div className="heat-grid" aria-hidden>
-              {Array.from({ length: 84 }, (_, i) => {
+              {Array.from({ length: 128 }, (_, i) => {
                 const base = metrics.heat[i % metrics.heat.length] ?? 0.2
                 // right-side heat cluster (GitHub-style recent activity)
-                const col = i % 14
-                const boost = col >= 10 ? 0.35 + (col - 10) * 0.12 : col >= 7 ? 0.08 : -0.12
-                const v = Math.min(1, Math.max(0.04, base * 0.55 + boost + ((i * 17) % 9) * 0.02))
-                const cool = v < 0.22
+                const col = i % 16
+                const boost =
+                  col >= 12 ? 0.42 + (col - 12) * 0.12 : col >= 8 ? 0.12 : col >= 5 ? 0.02 : -0.14
+                const v = Math.min(1, Math.max(0.05, base * 0.5 + boost + ((i * 17) % 9) * 0.025))
+                const cool = v < 0.2
                 return (
                   <span
                     key={i}
                     style={{
                       background: cool
-                        ? `rgba(15,30,60,${0.04 + v * 0.12})`
-                        : `linear-gradient(135deg, rgba(0,194,255,${0.18 + v * 0.72}), rgba(122,61,255,${0.1 + v * 0.55}))`,
+                        ? `rgba(10,22,44,${0.06 + v * 0.14})`
+                        : `linear-gradient(135deg, rgba(0,212,255,${0.28 + v * 0.72}), rgba(138,61,255,${0.16 + v * 0.62}))`,
+                      boxShadow: cool ? undefined : '0 0 4px rgba(0,212,255,0.18)',
                     }}
                   />
                 )
@@ -191,10 +193,10 @@ export default function App() {
               <span className="section-value">{metrics.throughput}/s</span>
             </div>
             <div className="thru-bars" aria-hidden>
-              {Array.from({ length: 28 }, (_, i) => {
+              {Array.from({ length: 36 }, (_, i) => {
                 const v = metrics.bars[i % metrics.bars.length] ?? 0.4
-                const jag = 0.55 + 0.45 * Math.sin(i * 1.7) * Math.cos(i * 0.55)
-                const h = Math.min(1, Math.max(0.12, v * jag))
+                const jag = 0.5 + 0.5 * Math.sin(i * 1.55) * Math.cos(i * 0.62)
+                const h = Math.min(1, Math.max(0.1, v * jag))
                 return <span key={i} style={{ height: `${Math.round(h * 100)}%` }} />
               })}
             </div>

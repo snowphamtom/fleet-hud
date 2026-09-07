@@ -1111,3 +1111,422 @@
 .dendrite {
   max-width: 100%;
 }
+
+
+/* ══ ANTI-BLAND — MAX fleet density pass ══════════════════════════════ */
+
+.app {
+  background:
+    radial-gradient(120% 58% at 50% -8%, rgba(0, 212, 255, 0.12), transparent 52%),
+    radial-gradient(80% 46% at 100% 18%, rgba(138, 61, 255, 0.09), transparent 48%),
+    radial-gradient(70% 40% at 0% 60%, rgba(47, 123, 255, 0.05), transparent 50%),
+    var(--bg);
+}
+
+.shell {
+  padding: 10px 12px 22px;
+  gap: 10px;
+}
+
+.hud-bar {
+  gap: 5px;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid var(--line-strong);
+  box-shadow: 0 1px 0 rgba(0, 212, 255, 0.06);
+}
+
+.hud-title {
+  font-size: 12.5px;
+  letter-spacing: 0.1em;
+}
+
+.hud-sub {
+  color: color-mix(in srgb, var(--mute) 85%, var(--cyan));
+  font-weight: 600;
+}
+
+.hud-metrics {
+  font-size: 10.5px;
+  color: color-mix(in srgb, var(--mute) 80%, var(--ink));
+}
+
+.hud-metrics b {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.hud-live.on {
+  color: var(--cyan);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.35);
+}
+
+.hud-live.on .dot {
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.28), 0 0 8px rgba(0, 212, 255, 0.55);
+}
+
+.hero {
+  gap: 8px;
+  padding: 2px 0 0;
+}
+
+.eyebrow {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--cyan);
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.25);
+}
+
+.hero-copy h1 {
+  font-size: 23px;
+  letter-spacing: -0.025em;
+}
+
+.hero-copy p {
+  font-size: 12.5px;
+  color: color-mix(in srgb, var(--mute) 88%, var(--ink));
+}
+
+.pill {
+  border-color: var(--line-strong);
+  color: color-mix(in srgb, var(--mute) 70%, var(--ink));
+  font-weight: 600;
+  background: color-mix(in srgb, var(--panel) 92%, var(--cyan));
+}
+
+.card-chip {
+  border-color: color-mix(in srgb, var(--violet) 42%, var(--line));
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.14), rgba(138, 61, 255, 0.14));
+  font-weight: 600;
+  box-shadow: var(--shadow-tight);
+}
+
+.hero-viz {
+  min-height: 256px;
+}
+
+.hero-viz::before {
+  inset: 12% 8%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 212, 255, 0.18),
+    rgba(47, 123, 255, 0.08) 45%,
+    rgba(138, 61, 255, 0.06) 62%,
+    transparent 74%
+  );
+}
+
+.dendrite {
+  filter:
+    drop-shadow(0 0 10px rgba(0, 212, 255, 0.22))
+    drop-shadow(0 10px 22px rgba(61, 107, 255, 0.18));
+}
+
+.dendrite-law {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.dendrite-sub {
+  font-size: 5.8px;
+  fill: color-mix(in srgb, var(--mute) 75%, var(--cyan));
+  letter-spacing: 0.14em;
+  font-weight: 700;
+}
+
+.hero-float {
+  color: color-mix(in srgb, var(--mute) 55%, var(--cyan));
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* Panels — richer HUD chrome, less dead air */
+.panel {
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: var(--shadow);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 251, 255, 0.98)),
+    var(--panel);
+}
+
+.section-label {
+  margin-bottom: 7px;
+}
+
+.section-title {
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--cyan) 55%, var(--mute));
+}
+
+.section-label.accent .section-title {
+  color: var(--violet);
+}
+
+.section-value {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.panel-foot {
+  margin-top: 7px;
+  font-size: 10px;
+  color: color-mix(in srgb, var(--mute) 85%, var(--cyan));
+}
+
+.fleet-modules {
+  gap: 8px;
+}
+
+.fleet-modules .panel {
+  padding: 9px 10px;
+}
+
+.run-log {
+  gap: 4px;
+  font-size: 10.5px;
+  max-height: 128px;
+  color: color-mix(in srgb, var(--mute) 70%, var(--ink));
+}
+
+.run-log .kw {
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.run-log .kw.grant {
+  color: var(--grant);
+}
+
+.run-log .kw.new {
+  color: var(--violet);
+}
+
+.run-log .n {
+  opacity: 0.85;
+  font-weight: 600;
+}
+
+/* ACCESS — thicker, louder bars */
+.access-rows {
+  gap: 6px;
+}
+
+.access-row {
+  grid-template-columns: 52px 1fr;
+  gap: 7px;
+}
+
+.access-row span {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--mute) 75%, var(--ink));
+}
+
+.bar-track {
+  height: 8px;
+  background: var(--track);
+  box-shadow: inset 0 0 0 1px rgba(10, 22, 44, 0.06);
+}
+
+.bar-fill {
+  background: linear-gradient(90deg, var(--cyan), var(--blue) 55%, var(--violet));
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.35);
+}
+
+/* BLAST — sharper gauge */
+.blast {
+  gap: 6px;
+}
+
+.blast-gauge {
+  width: 92px;
+  height: 92px;
+  background:
+    radial-gradient(circle at 50% 50%, var(--panel) 0 52%, transparent 53%),
+    conic-gradient(
+      from -90deg,
+      var(--cyan) 0 68%,
+      var(--blue) 68% 78%,
+      var(--violet) 78% 100%
+    );
+  box-shadow:
+    inset 0 0 0 1px rgba(10, 22, 44, 0.1),
+    0 0 16px rgba(0, 212, 255, 0.22),
+    0 0 28px rgba(138, 61, 255, 0.12);
+}
+
+.blast-gauge::after {
+  inset: 11px;
+  border: 1px solid color-mix(in srgb, var(--line-strong) 70%, var(--cyan));
+  box-shadow: inset 0 0 10px rgba(0, 212, 255, 0.06);
+}
+
+.blast-num {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.blast-copy {
+  font-size: 9.5px;
+  max-width: 18ch;
+  color: color-mix(in srgb, var(--mute) 80%, var(--ink));
+}
+
+/* ACTION HEAT — denser cells, louder hot cluster */
+.heat-grid {
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: 1.5px;
+}
+
+.heat-grid > span {
+  min-height: 7px;
+  border-radius: 1px;
+  background: var(--track);
+  box-shadow: inset 0 0 0 0.5px rgba(10, 22, 44, 0.04);
+}
+
+/* THROUGHPUT — sharper histogram */
+.thru-bars {
+  height: 72px;
+  gap: 1.5px;
+}
+
+.thru-bars > span {
+  border-radius: 1px 1px 0 0;
+  min-width: 2px;
+  background: linear-gradient(
+    180deg,
+    #5ef0ff 0%,
+    var(--cyan) 28%,
+    var(--blue) 70%,
+    color-mix(in srgb, var(--violet) 70%, var(--cyan)) 100%
+  );
+  box-shadow: 0 0 6px rgba(0, 212, 255, 0.22);
+}
+
+.thru-pulse {
+  margin-top: 6px;
+  height: 22px;
+  border-radius: 4px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(0, 212, 255, 0.45) 40%,
+      rgba(138, 61, 255, 0.4) 60%,
+      transparent 100%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 5px,
+      rgba(10, 22, 44, 0.06) 5px,
+      rgba(10, 22, 44, 0.06) 6px
+    );
+  box-shadow: inset 0 0 0 1px rgba(10, 22, 44, 0.06);
+}
+
+/* BOT STATUS — denser rows */
+.bot-list {
+  gap: 5px;
+}
+
+.bot-row {
+  grid-template-columns: 46px 1fr 28px;
+  gap: 6px;
+}
+
+.bot-row .name {
+  font-size: 10.5px;
+  font-weight: 700;
+}
+
+.bot-segs {
+  height: 7px;
+  gap: 2px;
+}
+
+.bot-segs i {
+  border-radius: 1px;
+}
+
+.bot-row.run .bot-segs i:nth-child(-n + 3) {
+  background: linear-gradient(90deg, var(--cyan), var(--blue));
+  box-shadow: 0 0 6px rgba(0, 212, 255, 0.35);
+}
+
+.bot-row.run .bot-state {
+  color: var(--cyan);
+  font-weight: 700;
+}
+
+.bot-state {
+  font-weight: 600;
+}
+
+.stage-grid {
+  gap: 8px;
+}
+
+.stage-panel.pulse {
+  border-color: color-mix(in srgb, var(--cyan) 55%, var(--line));
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.14), var(--shadow);
+}
+
+.mini-bars {
+  height: 48px;
+  gap: 2px;
+}
+
+.mini-bars > span {
+  background: linear-gradient(180deg, var(--cyan), var(--violet));
+  box-shadow: 0 0 5px rgba(0, 212, 255, 0.18);
+}
+
+.bottom-grid {
+  gap: 8px;
+}
+
+@media (max-width: 375px) {
+  .shell {
+    padding: 8px 10px 20px;
+    gap: 8px;
+  }
+
+  .fleet-modules {
+    gap: 6px;
+  }
+
+  .fleet-modules .panel {
+    padding: 8px 9px;
+  }
+
+  .hero-viz {
+    min-height: 232px;
+  }
+
+  .heat-grid {
+    gap: 1px;
+  }
+
+  .thru-bars {
+    height: 64px;
+  }
+}
+
+@media (min-width: 520px) {
+  .shell {
+    gap: 12px;
+  }
+
+  .fleet-modules {
+    gap: 9px;
+  }
+}
