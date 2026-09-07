@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import type { LineDelta, Verdict } from './lib/sort'
 import { DendriteRing } from './components/DendriteRing'
 import { GrokStub } from './components/GrokStub'
 import { HudBar } from './components/HudBar'
@@ -46,6 +47,11 @@ const RUN_SEED = [
 export default function App() {
   const [ledger, setLedger] = useState<LedgerEntry[]>([])
   const [stageCounts, setStageCounts] = useState(EMPTY_COUNTS)
+  const [sortViz, setSortViz] = useState<{
+    key: number
+    lines: LineDelta[]
+    verdict: Verdict
+  } | null>(null)
   const metrics = useLiveMetrics(5220 + ledger.length)
 
   const onSort = useCallback((entry: LedgerEntry) => {
@@ -57,9 +63,15 @@ export default function App() {
       Verdict: prev.Verdict + 1,
       Store: prev.Store + 1,
     }))
+    // Drive torus node scramble → GRANT/REFUSE cluster migration
+    setSortViz({
+      key: Date.now(),
+      lines: entry.result.lines,
+      verdict: entry.verdict,
+    })
   }, [])
 
-  const lastVerdict = ledger[0]?.verdict ?? null
+  const lastVerdict = ledger[0]?.verdict ?? sortViz?.verdict ?? null
 
   return (
     <div className="app">
@@ -93,7 +105,12 @@ export default function App() {
             <span className="hero-float a">SUBNET_004</span>
             <span className="hero-float b">ACTIVE_CORE</span>
             <span className="hero-float c">TRACE_002</span>
-            <DendriteRing size={292} />
+            <DendriteRing
+              size={292}
+              sortKey={sortViz?.key ?? 0}
+              lines={sortViz?.lines}
+              verdict={sortViz?.verdict ?? null}
+            />
           </div>
         </section>
 

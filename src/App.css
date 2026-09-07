@@ -1584,3 +1584,33 @@
     border-radius: 14px;
   }
 }
+
+/* ══ Sort-coupled torus node motion ═══════════════════════════════════ */
+.dendrite-mesh[data-sorting='1'] .cluster-hint {
+  opacity: 1;
+  transition: opacity 0.35s ease;
+}
+.dendrite-mesh .cluster-hint {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.dendrite-mesh[data-sorting='1'] {
+  filter:
+    drop-shadow(0 0 18px rgba(61, 255, 240, 0.28))
+    drop-shadow(0 0 14px rgba(255, 107, 138, 0.18))
+    drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
+}
+.dendrite-sort-nodes[data-phase='scramble'] .sort-node,
+.dendrite-sort-nodes[data-phase='sorting'] .sort-node {
+  /* rAF drives cx/cy; keep GPU-friendly */
+  will-change: cx, cy;
+}
+.hero-viz:has(.dendrite-mesh[data-sorting='1'])::before {
+  background: radial-gradient(
+    circle,
+    rgba(61, 255, 240, 0.18),
+    rgba(255, 107, 138, 0.1) 48%,
+    transparent 72%
+  );
+}
