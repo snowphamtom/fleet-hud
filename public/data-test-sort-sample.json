@@ -1,0 +1,1165 @@
+{
+  "report": "DATA_TEST_SORT",
+  "source": "drive_inv/DATA_TEST_SORT_2026-09-06.json",
+  "measured_at_ct": "2026-09-06 21:26 CT",
+  "clusterMode": "drive",
+  "note": "Slim public sample \u2014 KEEP/WATCH/NOISE/HOLD; size/mtime/mime when known, else metric heuristics (not folder labels)",
+  "counts": {
+    "KEEP": 40,
+    "WATCH": 25,
+    "NOISE": 25,
+    "HOLD": 25
+  },
+  "files": [
+    {
+      "id": "12B1OupkhFK0dNWlCYyTYnh6pmBUpOtne",
+      "title": "CeilingGate-Forge-gates-clip-SHOW3.mp4",
+      "mimeType": "video/mp4",
+      "mimeKind": "other",
+      "sizeBytes": 459519,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1zcoH4rpotKbZyKOQOFAsjOU3w3IKqgui",
+      "title": "CeilingGate-Forge-gates-clip-YT.mp4",
+      "mimeType": "video/mp4",
+      "mimeKind": "other",
+      "sizeBytes": 766761,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1aKds99oBEFsCNxvMiDIjy9qmnap6ToDz",
+      "title": "CeilingGate-Forge-gates-clip-HQ.mp4",
+      "mimeType": "video/mp4",
+      "mimeKind": "other",
+      "sizeBytes": 421673,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1a7iJtCXLD2k5tffQgLDJURfaHrbDQQ-f",
+      "title": "CeilingGate-Forge-gates-clip-HQ.mp4",
+      "mimeType": "video/mp4",
+      "mimeKind": "other",
+      "sizeBytes": 581384,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1goXrY8u4wEisT1GYe266i5RAmyKBKVCN2xaCJZfToEw",
+      "title": "CeilingGate Ops Channel \u2014 Taylor\u2194MANAGER",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 635102,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1XBHwNC48hdrX0GJzgpNOBc7CWtteG9MPQ1dcl2c-ZeU",
+      "title": "CeilingGate Ops Channel LIVE URL",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 565840,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1gyCEqgjrYAjE3qO8pkg-LmvycYr3rf-8",
+      "title": "ceilinggate-allgas-demo-20260905.zip",
+      "mimeType": "application/zip",
+      "mimeKind": "archive",
+      "sizeBytes": 20484476,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1t45iUmzwH-h-grJFNVrEyIjdcOYChljH",
+      "title": "ceilinggate-allgas-demo-20260905.tar.gz",
+      "mimeType": "application/x-gzip",
+      "mimeKind": "archive",
+      "sizeBytes": 20190341,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1aQtIOrZp-I3jYfNBir3eLJo2Lvac8tcL",
+      "title": "CeilingGate-AllGas-demo.mp4",
+      "mimeType": "video/mp4",
+      "mimeKind": "other",
+      "sizeBytes": 489301,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1z4Kk3n1JZAU8suQBQQHkklSaYO1b_y9p",
+      "title": "PERSISTENT_REALITY_COMPLETE_MERGED_CANONICAL_REG",
+      "mimeType": "application/pdf",
+      "mimeKind": "pdf",
+      "sizeBytes": 624550,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1ldhb8UazZq7NLc74JX7Dw7m7veIqg6Qa",
+      "title": "PERSISTENT_REALITY_COMPLETE_MERGED_CANONICAL_REG",
+      "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 535057,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1AlwzPy0YrOO6-YM-n-lEmYXLAu9vWbu5a72ZvW-TU_I",
+      "title": "Persistent Reality - Canonical Master Synthesis ",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 769034,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1dS4-4KfIq8RoQEB0573FmR-Vjd-XtWXe",
+      "title": "ceilinggate-allgas-demo-20260905.tar.gz",
+      "mimeType": "application/x-gzip",
+      "mimeKind": "archive",
+      "sizeBytes": 20244124,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1rtqlNzmWeTAk8RFb6YeJ6rLqr8iJipRU",
+      "title": "ceilinggate-allgas-demo-20260905.zip",
+      "mimeType": "application/zip",
+      "mimeKind": "archive",
+      "sizeBytes": 20406987,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1Z0VBefQFSmrKSm0HfnBl0CuNgzHUkJpKfj7_sgU7yAY",
+      "title": "CEILINGGATE_TEACHING_LOOP.md",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 406765,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1lFLi7S1oXc3HlqXZEry3DIQ8aPW3YuSkc86VvDarFEw",
+      "title": "CEILINGGATE_CONNECTIONS_2026-09-05.md",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 856312,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1g_jmffbRySBzS5XBmzijFqfGLZpecwX5zA0OAuvWpP8",
+      "title": "Ops Channel \u2014 CeilingGate (live)",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 462671,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1k0EsWK331YFawVGRN0tQfPu27w9WpLPOgP13Cx7oR90",
+      "title": "CeilingGate Ops Channel \u2014 Taylor\u2194MANAGER",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 633418,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1L2z4A-1xLOfepdG2AAa1utW26zbhoN9W",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 780511,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1l2bTqVoTTjKXLqN9DAKZWoZlG7_8XUpZ",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 663758,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1Ckq-2A1-NoGf4zCSYtxq1C6HN7kwEmfn",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 518562,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1kYXLd-BIBakB5OY2UkcnEor9p9wZg6rw",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 447047,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1Ll0QO_Awl1sjXQ2s8CUy95vbAJuUo30A",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 685016,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1iHBLtLXP6SU8jNTA_kkoUMQaPZIJvvbn",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 564179,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1BqIrnXHD-GTZwERWLNa4c4abVOj5wjje",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 517755,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1TxjxyjiU5vnbd6jqWf9SRh2aL0uTzkOT",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch1",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 572067,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1Ri8JvkN8f7Kfx8Y2U_4OwkXD5lJZ71y4",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch9",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 507703,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1CYavxZjjZAwDErI2FvufX2Rtx2YScSiO",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch8",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 705771,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1LzojPFEI_r7PEvvp0lWEnQYTXI2m0z2e",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch7",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 806784,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "18uxHFSPwLbxDWlmsv9IJh1dP6yUVKf11",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch6",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 560297,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1cJwsN_NMLgjMAdSydkOqejlQO2dQkl46",
+      "title": "HACKATHON_DATA_brief_CeilingGate_fixtures_batch5",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 682013,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1a0Hcs28fpH3s3oGvc8MbgegyBVGN4hOg",
+      "title": "HACKATHON DATA brief \u2014 CeilingGate fixtures \u2014 ba",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 402331,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1GRhQrnN5MasH7_Soyj1DeFeVM3K92AZp",
+      "title": "HACKATHON DATA brief \u2014 CeilingGate fixtures \u2014 ba",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 581517,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1iNnqPeHizQyiOYvDnhjypbqVXyAXPUBT",
+      "title": "HACKATHON DATA brief \u2014 CeilingGate fixtures \u2014 ba",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 419979,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1l1wjwE8SfhDgEX9F_hPNjZHQGPSkVZRAr7QjZCDv5z4",
+      "title": "HACKATHON DATA brief \u2014 CeilingGate fixtures \u2014 20",
+      "mimeType": "application/vnd.google-apps.document",
+      "mimeKind": "gdoc",
+      "sizeBytes": 454871,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1YbH7-Ld917wGv0Il3HxMkhCHzljpIJu6",
+      "title": "Living brief \u2014 batch USPTO_deep \u2014 2026-09-04.txt",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 840532,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1cSepVcPdl0QQkGylPAS3h7F-IATlFvEP",
+      "title": "Living brief \u2014 batch USPTO_deep \u2014 2026-09-04.txt",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 604169,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1CQvg_ICaxnuxYxm3MoK-l6Vv6O0kl70n",
+      "title": "Living brief \u2014 batch 05_PATENT_AND_COMMERCIAL \u2014 ",
+      "mimeType": "text/plain",
+      "mimeKind": "other",
+      "sizeBytes": 726892,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1_S2kxPqlxFV0WNp68eIbuVqqhUyMgyR0",
+      "title": "lynchpin_so2_lie.png",
+      "mimeType": "image/png",
+      "mimeKind": "image",
+      "sizeBytes": 626869,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "1qLauTXvrazQ5PkFSKB8qg5ms204yMUnu",
+      "title": "lynchpin_so2_orbit.png",
+      "mimeType": "image/png",
+      "mimeKind": "image",
+      "sizeBytes": 643930,
+      "mtimeAgeDays": 20,
+      "reportBucket": "KEEP",
+      "why": "patent/commercial/canonical signal"
+    },
+    {
+      "id": "19kveARJBTd5bgAZ-V4MkjIKoWY39lE3U",
+      "title": "Copy of ResidualGatesMathlib.lean",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3019187,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1O4XZY7KBBaxdejsyEIG47e3z_zgzoOFQ",
+      "title": "MAGPIE_outreach_email_2026-09-02.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3384243,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1ymGVXer-jnrAa2sJsp39sGFMr0lg3ycY",
+      "title": "MAGPIE_industry_one_pager_2026-09-02.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3358227,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1LPfytTPWLZJPjgsAPrIymxqg6yZCuS0L",
+      "title": "MAGPIE_RESIDUAL_INTEGRATED_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3007936,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1Snl1c38U7QCSHag0KD1fpkDSxA0B2-5nNKpaXCMwKX8",
+      "title": "Session_Export_4_2026-09-01",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3354880,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1YJ-NelCcYheAnb927iZ5EU_RBGgUtG3MYl4z0r0VQDM",
+      "title": "Session_Export_3_2026-09-01",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3200012,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1975hCW5py83gdUGmVE1iWMsg47e-CMJCB0c2_1KmgcE",
+      "title": "Session_Export_2_2026-09-01",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3331871,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1amoqr98FxFxpI8vRThRl4sKeI8IXrxtswck72VkHU74",
+      "title": "Session_Export_2026-09-01",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3080691,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1XvE6g5To3SwlAhDbSX3-NjJYCsuJP2Ih",
+      "title": "MAGPIE_v4.0.0_Unified_Merged_Master_Kodex.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3441566,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1O96pnJhlw33QwayYja7hRPztBrO4rb-V",
+      "title": "ai_seed_state.json",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3161437,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1pUK7TIjkIAJFj_CXvoIV87jU_Yzxoz-4",
+      "title": "MAGPIE_RESIDUAL_FORMAL_PROOF_DOSSIER.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 3275405,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1gId-2R532mOkJWgZRA-o27qWLW2F4Ue2",
+      "title": "MAGPIE_LEAN_ADMISSIBLE_EXPORT_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3328037,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1X_YghdbY2Dz1UNWbf7M7eeR-K2-bS_NA",
+      "title": "MAGPIE_HYBRID_REFINED_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3389240,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "16HsZLjXRkROh41stPNRKWR2vHrLdY_PO",
+      "title": "MAGPIE_RESIDUAL_FINAL_EXPORT_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3038553,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "13ZxGiFwv5YFHH7Gzip62g5ckkfaMYFER",
+      "title": "MAGPIE_RESIDUAL_HYBRID_FULL_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3193145,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1yKnAdDF2ZtCJXIZ31z0XXDWwRS0289FD",
+      "title": "MAGPIE_RESIDUAL_COMPLETE_EXPORT_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3224051,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "13DaKRkai4lV0_PKRnrKAU4AZQFIAATZ6",
+      "title": "MAGPIE_RESIDUAL_HYBRID_EXPORT_2026-08-18",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3016858,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1H5BWWyQPU7nc5KCLL2imyYLGXp4oCEIt",
+      "title": "RESIDUAL_HONEST_DUAL_GATE_SSV_EXPORT_2026-08-14",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3239660,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1tDdGBCNigKQxQB7qIaz5l79Q7-MDpnbd",
+      "title": "MAGPIE_RESIDUAL_UNIVERSAL_DOMAIN_EXPANSION_2026-",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3209230,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "14AMY87yvc1bUcrf62-XVopY6eBSzwSaMce6zYK1_N9M",
+      "title": "RESIDUAL_HONEST_DUAL_GATE_SSV_COMPLETE_EXPORT",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3482930,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1UUmbLk02k6lcpyEK8TInToBpXxwP0Xzj",
+      "title": "+Magpie.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 3426248,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1bGihLDohA5AygH6fKdCVk2lBvq48YcQF",
+      "title": "MAGPIE_v4.0.0_Unified_Merged_Master_Kodex.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3484148,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1_LzpiElOsLU3Y2tC-WwygqRQMpcYYow5",
+      "title": "Interaction Residual Historical Validation 1.0.0",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3218684,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "1PUhjD1ZLOzyIac2HAh5g6_gaJuAyTyiv",
+      "title": "CHIMERA MAGPIE INTEGRATED V2 \u2014 COMPLETE 2026-08-",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3274785,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "magpie/export dump or likely dupe"
+    },
+    {
+      "id": "17w7b4ci9NSaRBVuPoWLpTAvuzkYtQhS9",
+      "title": "Kingmaker Sovereign Resonant Architecture",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 3436777,
+      "mtimeAgeDays": 180,
+      "reportBucket": "WATCH",
+      "why": "export/magpie folder"
+    },
+    {
+      "id": "1qLf_LZNz533zILkO9Jqz1EajW4NjsS4AtJrjxQoxj9g",
+      "title": "Mirrored Truth \u2014 Plate 081: The Clearing of the ",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 66006,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1uk2W2TroCFeHIeikzybSweuUUNzpH5hLxFUSi-tkX8k",
+      "title": "Rotating_Mirror_Shadow_Ledger_2026-09-01",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 64613,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1tmLSDmjJCNBCm5tjhDFP1hIqtlP7E2o5",
+      "title": "MIRRORED_TRUTH_PERFECTED_COMPLETE_HYBRID_MASTER_",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 238076,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1Kbneu4Zyys2kHTh2yq0MHfDuOxl8TGRb",
+      "title": "MIRRORED_TRUTH_VOLUME_III_DERIVED_FROM_DRIVE.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 156806,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1Y7-Xr3JZ4mp6vhTBonWC6WOcMzjFJ4ff",
+      "title": "04%20%E2%80%94%20MIRRORED%20TRUTH%20%E2%80%94%20",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 265286,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1AQyUD9gI7s2w1C_s2sG_1MM7LQN-sRPX",
+      "title": "Mirrored_Truth_Volume_3_Refined.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 324179,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1Y2mNKRdLGJ7jfWOZTVD47G-LtsE2mBAm",
+      "title": "Mirrored_Truth_Volume_4_Refined.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 118589,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "113I8n_xbtVNpnKDtQww8o0KHTJmOz0On",
+      "title": "CHESHIRE GRIN.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 184872,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1_qZuvgNveK9uI21k9RLum917nM1EVgKI",
+      "title": "ZzzZ",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 301739,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1DtNcnYZieg0x1TdqWYa7NAG2Jc-n2hqa",
+      "title": "Mirrors",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 378330,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1ZQLZCiDVo-U6fMS3XdLi9_BeUpn8dbA6",
+      "title": "Mirrored Truth \u2014 Definitive Five-Volume Edition",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 79506,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1fWa4knrNtJyvDguLkJXNcQxJzfWHmfXr",
+      "title": "MIRRORED TRUTH \u2014 COMPLETE HYBRIDIZED MASTER EDIT",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 94065,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "17zybCpktKGo1jupXIVQcHBKtNmaX7pij",
+      "title": "01%20%E2%80%94%20MIRRORED%20TRUTH%20%E2%80%94%20",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 388977,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "17Z8twleGT6uGYvp0g0MKExoSylKUCSJMEEyMT8_DKk8",
+      "title": "Mirrored Truth \u2014 Volume II \u2014 Mathematical Archit",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 443234,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "16IDBXA-YqvZYLEjhiYmh2nPw6WBLFqYu-VIlFQ5DF5I",
+      "title": "00A \u2014 COMPLETE MERGED HYBRID MASTER INDEX + MIRR",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 277726,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1fO8qUXklJ3kWBeSiLtueJiwFs4R_0qm00b7XALHpWHM",
+      "title": "Mirrored Truth \u2014 Operational Archive \u2014 Polished ",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 183079,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1-w17CWZB_Ghey385DX45J8GCfPdsUBg9W2lrHl65WP4",
+      "title": "Mirrored Truth \u2014 Volume III \u2014 Computation & Algo",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 335810,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1ufGt0f3RUIxvL2nKwqfNf-yiFCTA0iSQHqEfBM3yXQY",
+      "title": "00 \u2014 START HERE \u2014 MIRRORED TRUTH \u2014 COMPLETE MAST",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 73307,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1b70bht9I4sZ-P3GCUdrfx6SwjwVMfHySVd810We23mA",
+      "title": "Mirrored Truth \u2014 Volume III \u2014 Polished Unified E",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 182312,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "15H_65bZVqRek8YrC5bKEce-kpYurJCFuiawUrDcC-Fg",
+      "title": "Mirrored Truth \u2014 Volume IV \u2014 Polished Unified Ed",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 280039,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1KQNPjYi__PMdmwO3IwspSdKJv08GX_P46USgTUPzUFU",
+      "title": "Mirrored_Truth_Volume_V_Universal_Synthesis_and_",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 45544,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1MiYW01EjlFk_mhKOytVyB2vY6vrshqIpH2KZR0qatfI",
+      "title": "Mirrored Truth \u2014 Volume I \u2014 Definitive Edition",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 122036,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1SzLUmbPztd_XbcF9hypnHz3zHL9YlUYXghdPTVInlR0",
+      "title": "First Worked Mirror-Ledger \u2014 Ego-Depletion RRR (",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 165620,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1vaIAeXbNl3Tng04kShNSTRWnZxYxM5L2pEzxOmdJSdM",
+      "title": "Mirrored Truth \u2014 Volume I \u2014 Polished Unified Edi",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 283028,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1Bunox7ffQCUJzkQmlbXdhUd2QIuBGlIhFfmPnsdOTes",
+      "title": "Mirrored Truth \u2014 Volume I \u2014 Native Master",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 18916,
+      "mtimeAgeDays": 800,
+      "reportBucket": "NOISE",
+      "why": "mirror/ZzzZ/art/school/book-dupe pattern"
+    },
+    {
+      "id": "1NVE2W5OlixouCRNtuDXtqbhRDb8DYZH-",
+      "title": "Picture book .pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 213335644,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1er_iPnpwghGmAaQRvjVamDiySel1cFTI",
+      "title": "Blank Layout.pages",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 185966864,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1xNDMOxCy3SsZgEtvFvYTx1hZJiIyA9ZS",
+      "title": "ZENITH_EMPIRICAL_PROTOCOL_CARVED_IVORY_COMPLETE_",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 136442358,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1vCw-esrg_Eo83vJLk3AlkkRKIK_4GVeD",
+      "title": "Saved Photos 2.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 126146609,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1X_yfz_LOGQBRkQ5Cn-vWQUMSnj3MTnY8",
+      "title": "Blank Layout 3.pages",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 114198222,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1f42TPnhoTqz3As_NWpEipLbrt0fxncP1",
+      "title": "Saved Photos.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 113822628,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1sW-MFRAHcjTHyfhq_QjwX74t5oE1PdH5",
+      "title": "Art.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 113822628,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1fqmODLdu6YyyhDtSy3LxOXi69rw5j6F4",
+      "title": "Copy of Saved Photos.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 113822628,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1IgLHOUyBdfmcuHLu_dYNowleEUxijGWg",
+      "title": "Saved Photos.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 113822628,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1qEVd_ruHkovukB91FkePGeZtUwFWLxNM",
+      "title": "Pics.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 113806794,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1nSqpuOs4PYieaYYfT8jf2ixpc0MpdMaV",
+      "title": "Pics.pdf.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 113805630,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "14OM9wgnBEc6jIeIJOt-WGCpQfcTCpaCT",
+      "title": "Saved Photos 3.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 101787257,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "13Sx9owKlcDdO8AChNLC8igmKqxKl8zDw",
+      "title": "PERSISTENT_REALITY_RETAIL_EDITION_COMPLETE.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 55115682,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1Y7z2b8xves4kZwHUHLngk5ZNVJrIMxru",
+      "title": "Saved Photos 4.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 44537515,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1q_oOOAdGuLdnnDmR0xQKt7mOIOOjdifR",
+      "title": "The Architecture of Coherence.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 37347739,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1sEuxFSstsfIH1klITMEyZsX3pfkQvr-z",
+      "title": "The Architecture of Coherence.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 37347739,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1UXU4E75gk8v9J5YDbAadLTI06MKH20Sw",
+      "title": "PERSISTENT_REALITY_RETAIL_EDITION_COMPLETE.docx",
+      "mimeType": null,
+      "mimeKind": "other",
+      "sizeBytes": 34371593,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1SAqO-D22PRhNTre4ur60gP_emPOvszpr",
+      "title": "ZENITH_EMPIRICAL_PROTOCOL_COMPLETE_VOLUMES_WITH_",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 33434184,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1Wq8SJCBkrUHSrBEoE4n2cVOEQSlHb-yq",
+      "title": "ZEP.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 33235765,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1KmbiG1xXjrUwVagqrliatmvJV4QoVadR",
+      "title": "ZENITH_EMPIRICAL_PROTOCOL_VOLUME_III_MATCHED_TO_",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 31764226,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1wgKxWmBhPIoWLVwCsh9mf0qoB_fRFlc-",
+      "title": "ZENITH_EMPIRICAL_PROTOCOL_VOLUME_III_MATCHED_TO_",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 31764226,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1y0fafOP47KISJuzwoGT8g2uObZPPo4OG",
+      "title": "V3.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 31031491,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1pmkjBWuQ40KyXp2TPYYMG2r7_B2XV1hj",
+      "title": "V3.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 31031491,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "13nMuxaAYnezAqCSjheJOg1UJk3qPJ2zq",
+      "title": "V1.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 30312703,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    },
+    {
+      "id": "1SfVRvg0knqee5ZDx8CaqMp1vFVFvATDd",
+      "title": "V1.pdf",
+      "mimeType": null,
+      "mimeKind": "pdf",
+      "sizeBytes": 30312703,
+      "mtimeAgeDays": 400,
+      "reportBucket": "HOLD",
+      "why": "huge archive / uncertain package"
+    }
+  ]
+}

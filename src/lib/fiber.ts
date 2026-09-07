@@ -355,15 +355,72 @@ export function fiberSortFromResult(result: SortResult, kind: FiberKind = 'demo'
   return fiberSortFromLines(result.lines, kind)
 }
 
+/** Map DATA_TEST_SORT report buckets → DriveBucket (metrics lane). */
+export function reportBucketToDrive(b: string): DriveBucket {
+  const u = b.toUpperCase()
+  if (u === 'KEEP') return 'keep'
+  if (u === 'WATCH' || u === 'HOLD') return 'watch'
+  return 'ignore' // NOISE / unknown
+}
+
+function mimeKindFromRaw(mimeType: unknown, title: unknown): MimeKind {
+  const m = String(mimeType ?? '').toLowerCase()
+  const t = String(title ?? '').toLowerCase()
+  if (m.includes('folder')) return 'folder'
+  if (m.includes('pdf') || t.endsWith('.pdf')) return 'pdf'
+  if (m.includes('document') || m.includes('gdoc')) return 'gdoc'
+  if (m.includes('sheet') || m.includes('spreadsheet')) return 'sheet'
+  if (m.includes('image') || /\.(png|jpe?g|gif|webp)$/.test(t)) return 'image'
+  if (m.includes('zip') || m.includes('archive') || /\.(zip|tar|gz)$/.test(t)) return 'archive'
+  return 'other'
+}
+
+function nodeFromDriveFile(f: Record<string, unknown>, i: number): FiberNode | null {
+  const title = String(f.title ?? f.name ?? f.label ?? '')
+  const id = String(f.id ?? `drive-${i}`)
+  let sizeBytes = Number(f.sizeBytes ?? f.size ?? NaN)
+  let mtimeAgeDays = Number(f.mtimeAgeDays ?? f.ageDays ?? NaN)
+  let mimeKind = (f.mimeKind as MimeKind | undefined) || mimeKindFromRaw(f.mimeType ?? f.mime, title)
+
+  // Report bucket from DATA_TEST_SORT (KEEP/WATCH/NOISE/HOLD) wins when present
+  const reportRaw = String(f.reportBucket ?? f.bucket ?? '')
+  let bucket: DriveBucket | undefined
+  if (reportRaw) bucket = reportBucketToDrive(reportRaw)
+
+  // Fill missing metrics with band heuristics (not folder-label costumes)
+  if (!Number.isFinite(sizeBytes) || sizeBytes < 0) {
+    sizeBytes =
+      bucket === 'keep' ? 400_000 : bucket === 'watch' ? 3_000_000 : bucket === 'ignore' ? 8_000 : 250_000
+  }
+  if (!Number.isFinite(mtimeAgeDays) || mtimeAgeDays < 0) {
+    mtimeAgeDays = bucket === 'keep' ? 20 : bucket === 'watch' ? 180 : bucket === 'ignore' ? 800 : 120
+  }
+
+  const seed = { sizeBytes, mtimeAgeDays, mimeKind }
+  if (!bucket) bucket = driveBucketOf(seed)
+  const { claimed, source } = driveMetricsToCS({ ...seed, bucket })
+  return {
+    id,
+    label: (title || id).slice(0, 40),
+    claimed,
+    source,
+    kind: 'drive',
+    sizeBytes,
+    mtimeAgeDays,
+    mimeKind,
+    bucket,
+  }
+}
+
 /**
- * Ingest Drive sort JSON when Heavy’s measure lands
- * (`/workspace/drive_inv/DATA_TEST_SORT_*.json`). Accepts FiberSort shape,
- * `{ claimed, source }`, or `{ files: [{ sizeBytes, mtimeAgeDays, mimeKind }] }`.
+ * Ingest Drive sort JSON — live `DATA_TEST_SORT_*.json` or slim public sample.
+ * Accepts: FiberSort · { files } · { claimed, source } · DATA_TEST_SORT report
+ * (top_KEEP_titles / sample_WATCH / sample_NOISE / sample_HOLD).
  */
 export function tryParseDriveFiberSort(raw: unknown): FiberSort | null {
   if (!raw || typeof raw !== 'object') return null
   const o = raw as Record<string, unknown>
-  if (Array.isArray(o.nodes) && Array.isArray(o.edges)) {
+  if (Array.isArray(o.nodes) && (Array.isArray(o.edges) || o.clusterMode === 'drive')) {
     const nodes = o.nodes as FiberNode[]
     if (!nodes.length) return null
     if (o.clusterMode === 'drive' || nodes.some((n) => n.bucket)) {
@@ -380,37 +437,61 @@ export function tryParseDriveFiberSort(raw: unknown): FiberSort | null {
       : weaveEdges(nodes, grantIds, refuseIds)
     return { nodes, edges, grantIds, refuseIds, clusterMode: 'cs' }
   }
-  if (Array.isArray(o.files)) {
-    const files = o.files as Array<Record<string, unknown>>
+
+  // Slim public sample or { files: [...] }
+  if (Array.isArray(o.files) && o.files.length) {
     const nodes: FiberNode[] = []
-    for (let i = 0; i < files.length; i++) {
-      const f = files[i]
-      const sizeBytes = Number(f.sizeBytes ?? f.size ?? 0)
-      const mtimeAgeDays = Number(f.mtimeAgeDays ?? f.ageDays ?? 0)
-      const mimeKind = (String(f.mimeKind ?? f.mime ?? 'other') as MimeKind) || 'other'
-      if (!Number.isFinite(sizeBytes) || !Number.isFinite(mtimeAgeDays)) continue
-      const seed = { sizeBytes, mtimeAgeDays, mimeKind }
-      const bucket = driveBucketOf(seed)
-      const { claimed, source } = driveMetricsToCS({ ...seed, bucket })
-      nodes.push({
-        id: `drive-${i}`,
-        label: `d${i + 1}`,
-        claimed,
-        source,
-        kind: 'drive',
-        sizeBytes,
-        mtimeAgeDays,
-        mimeKind,
-        bucket,
-      })
+    for (let i = 0; i < (o.files as unknown[]).length; i++) {
+      const f = (o.files as Record<string, unknown>[])[i]
+      if (!f || typeof f !== 'object') continue
+      const n = nodeFromDriveFile(f, i)
+      if (n) nodes.push(n)
     }
     if (!nodes.length) return null
     return sealDriveFiberSort(nodes)
   }
+
+  // Full DATA_TEST_SORT report shape
+  if (o.report === 'DATA_TEST_SORT' || o.sort || o.top_KEEP_titles) {
+    const packs: Array<[string, unknown]> = [
+      ['KEEP', o.top_KEEP_titles],
+      ['WATCH', o.sample_WATCH],
+      ['NOISE', o.sample_NOISE],
+      ['HOLD', o.sample_HOLD],
+    ]
+    const nodes: FiberNode[] = []
+    let i = 0
+    for (const [bucket, arr] of packs) {
+      if (!Array.isArray(arr)) continue
+      for (const item of arr) {
+        if (!item || typeof item !== 'object') continue
+        const f = { ...(item as Record<string, unknown>), reportBucket: bucket }
+        const n = nodeFromDriveFile(f, i++)
+        if (n) nodes.push(n)
+      }
+    }
+    if (!nodes.length) return null
+    return sealDriveFiberSort(nodes)
+  }
+
   if (Array.isArray(o.claimed) && Array.isArray(o.source)) {
     return buildFiberSort(o.claimed as number[], o.source as number[], { kind: 'drive' })
   }
   return null
+}
+
+/** Fetch slim public Drive sort sample (Pages-safe). */
+export async function loadPublicDriveSortSample(
+  url = '/data-test-sort-sample.json',
+): Promise<FiberSort | null> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    const raw: unknown = await res.json()
+    return tryParseDriveFiberSort(raw)
+  } catch {
+    return null
+  }
 }
 
 export function fiberNodeToLineDelta(n: FiberNode, index = 0): LineDelta {

@@ -4,6 +4,7 @@ import {
   buildFiberSort,
   buildNeverAgainBraidSort,
   fiberVerdict,
+  loadPublicDriveSortSample,
   type FiberSort,
 } from '../lib/fiber'
 import {
@@ -127,6 +128,40 @@ export function SortingDemo({ ledger, onSort }: Props) {
   }
 
 
+
+  async function runDriveJson() {
+    const fiber = await loadPublicDriveSortSample('/data-test-sort-sample.json')
+    if (!fiber) return
+    const claimed = fiber.nodes.map((n) => n.claimed)
+    const source = fiber.nodes.map((n) => n.source)
+    const result = sortClaim(
+      claimed.length ? claimed : [0],
+      source.length ? source : [0],
+    )
+    const verdict = fiber.refuseIds.length ? 'REFUSE' : fiberVerdict(fiber)
+    setClaimedRaw(claimed.slice(0, 6).join(', ') + (claimed.length > 6 ? ', …' : ''))
+    setSourceRaw(source.slice(0, 6).join(', ') + (source.length > 6 ? ', …' : ''))
+    setLast(result)
+    onSort({
+      id: makeId(),
+      at: Date.now(),
+      label: `Drive JSON · ${fiber.nodes.length} units · keep/watch/ignore`,
+      verdict,
+      result: {
+        ...result,
+        verdict,
+        lines: fiber.nodes.slice(0, 48).map((n, i) => ({
+          index: i,
+          claimed: n.claimed,
+          source: n.source,
+          ok: n.claimed <= n.source,
+          overage: Math.max(0, n.claimed - n.source),
+        })),
+      },
+      fiber,
+    })
+  }
+
   return (
     <section className="sorting-block">
       <SectionLabel title="TRY" value="C ≤ S" accent />
@@ -148,6 +183,9 @@ export function SortingDemo({ ledger, onSort }: Props) {
         </button>
         <button type="button" className="btn primary" onClick={runDriveWeb}>
           Demo Drive Sort
+        </button>
+        <button type="button" className="btn ghost" onClick={() => void runDriveJson()}>
+          Load Drive JSON
         </button>
         <button type="button" className="btn grant" onClick={runBraid}>
           Demo Braid 7
