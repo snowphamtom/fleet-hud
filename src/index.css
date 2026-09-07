@@ -1,0 +1,57 @@
+:root {
+  --bg: #f7f9fc;
+  --ink: #0b1220;
+  --mute: #5b6b82;
+  --cyan: #00c2ff;
+  --blue: #3d6bff;
+  --violet: #7a3dff;
+  --grant: #00a86b;
+  --refuse: #e11d48;
+  --line: rgba(15, 30, 60, 0.12);
+  --panel: #ffffff;
+  --panel-soft: rgba(255, 255, 255, 0.92);
+  --track: rgba(15, 30, 60, 0.06);
+  --shadow: 0 1px 0 rgba(15, 30, 60, 0.04), 0 8px 24px rgba(15, 30, 60, 0.04);
+  --font: system-ui, -apple-system, 'Segoe UI', Inter, Roboto, sans-serif;
+  --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --phone: 430px;
+  color: var(--ink);
+  background: var(--bg);
+  font-family: var(--font);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+a {
+  color: var(--blue);
+}
+
+::selection {
+  background: rgba(0, 194, 255, 0.22);
+  color: var(--ink);
+}
