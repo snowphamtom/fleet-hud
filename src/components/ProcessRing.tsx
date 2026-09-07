@@ -160,7 +160,7 @@ export function ProcessRing({ snap, active, onSelect, litThrough }: Props) {
   )
 }
 
-export function useRingLightUp(max = 5, stepMs = 520) {
+export function useRingLightUp(max = 5, stepMs = 520, restartKey?: string) {
   const [lit, setLit] = useState(0)
   useEffect(() => {
     setLit(0)
@@ -171,7 +171,7 @@ export function useRingLightUp(max = 5, stepMs = 520) {
       if (n >= max) window.clearInterval(id)
     }, stepMs)
     return () => window.clearInterval(id)
-  }, [max, stepMs])
+  }, [max, stepMs, restartKey])
   return lit
 }
 

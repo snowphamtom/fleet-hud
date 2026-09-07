@@ -1038,3 +1038,22 @@
     border-radius: 14px;
   }
 }
+
+/* live Convex tick */
+.pulse-dot.live {
+  animation: pulse 0.9s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(0, 255, 200, 0.85);
+}
+.app.data-tick .hero-nums strong,
+.app.data-tick .stat-n,
+.app.data-tick .pring-core-num {
+  animation: tickFlash 0.55s ease-out;
+}
+@keyframes tickFlash {
+  0% { color: #00ffc8; text-shadow: 0 0 12px rgba(0,255,200,0.7); }
+  100% { color: inherit; text-shadow: none; }
+}
+.pill.live-ago {
+  color: #7ad9c4;
+  border-color: rgba(0, 255, 200, 0.35);
+}

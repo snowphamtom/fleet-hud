@@ -63,4 +63,5 @@ export type ProcessSnapshot = {
     artifacts: string[]
   }
   locks: string[]
+  pendingHolds?: { id: string; kind: string; target: string; why: string }[]
 }
