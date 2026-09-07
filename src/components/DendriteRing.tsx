@@ -29,7 +29,7 @@ const R_TUBE = 22
 const TILT = 0.62
 const SEGS_U = 40
 const SEGS_V = 14
-const NODE_COUNT = 56
+const NODE_COUNT = 64
 const DUST = 72
 
 /** Dandelin foci of the cutting-plane ellipse (GRANT=F, REFUSE=F′) */
@@ -39,10 +39,10 @@ const FOCUS_REFUSE = { x: CX + 42, y: CY + 2 }
 const APEX = { x: CX, y: CY - 78 }
 
 /** Phase timings (ms) */
-const T_SCRAMBLE = 380
-const T_SORT = 1200
-const T_SETTLE_HOLD = 1700
-const T_EASE_HOME = 950
+const T_SCRAMBLE = 140
+const T_SORT = 480
+const T_SETTLE_HOLD = 700
+const T_EASE_HOME = 400
 
 function torusPoint(u: number, v: number, tilt = TILT): Pt {
   const cosU = Math.cos(u)
