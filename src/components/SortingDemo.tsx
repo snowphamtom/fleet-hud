@@ -205,19 +205,33 @@ export function SortingDemo({ ledger, onSort }: Props) {
     }
   }
 
+  const stagePulse = last ? 4 : 0
+
   return (
-    <section className="sorting-block">
-      <SectionLabel title="TRY" value="C ≤ S" accent />
+    <section className="sorting-block" id="judge-path">
+      <SectionLabel title="JUDGE PATH" value="C ≤ S" accent />
       <p className="try-hint">
-        Tap Demo GRANT / REFUSE / Drive / Braid 7 — metrics → keep/watch/ignore
-        {ALL_GAS.convex.configured ? ' · Convex live' : ' · local sort'}.
+        One path: Intake → Verdict. Tap Demo GRANT or Demo REFUSE
+        {ALL_GAS.convex.configured ? ' · Convex live' : ' · local fallback'}.
       </p>
-      <div className="demo-row">
+      <ol className="judge-stages" aria-label="Intake to Verdict">
+        {['Intake', 'Filter', 'Evidence', 'Verdict', 'Store'].map((name, i) => (
+          <li key={name} className={last && i <= stagePulse ? 'on' : undefined}>
+            {i + 1}. {name}
+          </li>
+        ))}
+      </ol>
+      <div className="demo-row judge-demo">
         <button
           type="button"
           className="btn grant grant-btn"
           disabled={busy}
-          onClick={() => void run(DEMO_GRANT.label, DEMO_GRANT.claimed, DEMO_GRANT.source)}
+          onClick={() => {
+            void (async () => {
+              await run(DEMO_GRANT.label, DEMO_GRANT.claimed, DEMO_GRANT.source)
+              document.getElementById('result-stamp')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            })()
+          }}
         >
           Demo GRANT
         </button>
@@ -225,26 +239,49 @@ export function SortingDemo({ ledger, onSort }: Props) {
           type="button"
           className="btn refuse refuse-btn"
           disabled={busy}
-          onClick={() => void run(DEMO_REFUSE.label, DEMO_REFUSE.claimed, DEMO_REFUSE.source)}
+          onClick={() => {
+            void (async () => {
+              await run(DEMO_REFUSE.label, DEMO_REFUSE.claimed, DEMO_REFUSE.source)
+              document.getElementById('result-stamp')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+            })()
+          }}
         >
           Demo REFUSE
         </button>
-        <button type="button" className="btn primary" disabled={busy} onClick={runDriveWeb}>
-          Demo Drive Sort
-        </button>
-        <button type="button" className="btn ghost" disabled={busy} onClick={() => void runDriveJson()}>
-          Load Drive JSON
-        </button>
-        <button type="button" className="btn grant" disabled={busy} onClick={runBraid}>
-          Demo Braid 7
-        </button>
-        {ALL_GAS.convex.configured ? (
-          <button type="button" className="btn ghost" disabled={busy} onClick={() => void onPushEvidence()}>
-            Push evidence
-          </button>
-        ) : null}
       </div>
+      {last ? (
+        <p className={`judge-verdict ${last.verdict.toLowerCase()}`} role="status">
+          <span className={`stamp ${last.verdict.toLowerCase()}`}>{last.verdict}</span>
+          <span>
+            {' '}
+            · {last.lines.filter((l) => l.ok).length}/{last.lines.length} lines C≤S
+            {via ? ` · via ${via}` : ''}
+          </span>
+        </p>
+      ) : (
+        <p className="try-hint">Awaiting click → stamp</p>
+      )}
       {evidenceMsg ? <p className="try-hint">{evidenceMsg}</p> : null}
+
+      <details className="more-demos">
+        <summary>More demos (Drive / braid)</summary>
+        <div className="demo-row">
+          <button type="button" className="btn primary" disabled={busy} onClick={runDriveWeb}>
+            Demo Drive Sort
+          </button>
+          <button type="button" className="btn ghost" disabled={busy} onClick={() => void runDriveJson()}>
+            Load Drive JSON
+          </button>
+          <button type="button" className="btn grant" disabled={busy} onClick={runBraid}>
+            Demo Braid 7
+          </button>
+          {ALL_GAS.convex.configured ? (
+            <button type="button" className="btn ghost" disabled={busy} onClick={() => void onPushEvidence()}>
+              Push evidence
+            </button>
+          ) : null}
+        </div>
+      </details>
 
       <article className="panel sort-shell">
         <SectionLabel

@@ -123,6 +123,25 @@ export default function App() {
           </div>
         </section>
 
+
+        <section className="judge-dock" id="judge-dock" aria-label="Judge path">
+          <StagePanels
+            pulse={metrics.stagePulse}
+            metrics={metrics}
+            stageCounts={stageCounts}
+            fiberSort={sortViz?.fiber ?? null}
+          />
+          <SortingDemo ledger={ledger} onSort={onSort} />
+          <div className="result-strip" id="result-stamp" aria-live="polite">
+            <span>// RESULT STAMP</span>
+            {lastVerdict ? (
+              <span className={`stamp ${lastVerdict.toLowerCase()}`}>{lastVerdict}</span>
+            ) : (
+              <span>awaiting Demo GRANT / REFUSE</span>
+            )}
+          </div>
+        </section>
+
         {/* FUI modular status chrome — client demo only */}
         <section className="fleet-modules" aria-label="Fleet status modules">
           <article className="panel">
@@ -254,23 +273,6 @@ export default function App() {
 
         </section>
 
-        <StagePanels
-          pulse={metrics.stagePulse}
-          metrics={metrics}
-          stageCounts={stageCounts}
-          fiberSort={sortViz?.fiber ?? null}
-        />
-
-        <SortingDemo ledger={ledger} onSort={onSort} />
-
-        <div className="result-strip" aria-live="polite">
-          <span>// RESULT STAMP</span>
-          {lastVerdict ? (
-            <span className={`stamp ${lastVerdict.toLowerCase()}`}>{lastVerdict}</span>
-          ) : (
-            <span>awaiting Demo GRANT / REFUSE</span>
-          )}
-        </div>
 
         <div className="bottom-grid">
           <GrokStub />
