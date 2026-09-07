@@ -1,5 +1,5 @@
 import { STAGES, type Stage } from '../lib/config'
-import { bucketCounts, type FiberSort } from '../lib/fiber'
+import { bucketCounts, FIBER_STRANDS, type FiberSort } from '../lib/fiber'
 import { SectionLabel } from './SectionLabel'
 
 type Props = {
@@ -69,6 +69,16 @@ export function StagePanels({ pulse, metrics, stageCounts, fiberSort }: Props) {
                   </span>
                 ))}
               </div>
+              {fiberSort.clusterMode === 'braid' ? (
+                <div className="strand-row">
+                  {FIBER_STRANDS.map((s) => (
+                    <span key={s.id} className="strand-chip">
+                      {s.roman} {s.short}
+                    </span>
+                  ))}
+                  <span className="strand-chip">→ GRANT/REFUSE</span>
+                </div>
+              ) : null}
             </>
           ) : null}
         </div>

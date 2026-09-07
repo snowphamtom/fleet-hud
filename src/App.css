@@ -1807,3 +1807,18 @@
     animation: none;
   }
 }
+
+.strand-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+.strand-chip {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.35rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #c8d6f0;
+}

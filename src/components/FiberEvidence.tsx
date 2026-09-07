@@ -1,11 +1,13 @@
 import type { FiberNode } from '../lib/fiber'
 import {
   bucketOf,
+  FIBER_STRANDS,
   fiberColor,
   formatBytes,
   freshnessOf,
   residualOf,
   sizeWeight,
+  strandColor,
 } from '../lib/fiber'
 import { SectionLabel } from './SectionLabel'
 
@@ -45,6 +47,15 @@ export function FiberEvidence({ node, onClose }: Props) {
           <dt>mime</dt>
           <dd>{node.mimeKind ?? '—'}</dd>
         </div>
+        {node.strand ? (
+          <div>
+            <dt>strand</dt>
+            <dd style={{ color: strandColor(node.strand) }}>
+              {FIBER_STRANDS.find((s) => s.id === node.strand)?.roman} ·{' '}
+              {FIBER_STRANDS.find((s) => s.id === node.strand)?.short}
+            </dd>
+          </div>
+        ) : null}
         <div>
           <dt>size</dt>
           <dd>

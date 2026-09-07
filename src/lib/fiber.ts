@@ -8,6 +8,30 @@ export type MimeKind = 'pdf' | 'gdoc' | 'image' | 'folder' | 'archive' | 'sheet'
 
 export type DriveBucket = 'keep' | 'watch' | 'ignore'
 
+/** Never Again seven-strand braid (fuel lock — ignore Class E/F mythos) */
+export type FiberStrand =
+  | 'observation'
+  | 'primary'
+  | 'mirror'
+  | 'residual'
+  | 'retained'
+  | 'physical'
+  | 'epistemic'
+
+export const FIBER_STRANDS: {
+  id: FiberStrand
+  roman: string
+  short: string
+}[] = [
+  { id: 'observation', roman: 'I', short: 'Observation' },
+  { id: 'primary', roman: 'II', short: 'Primary' },
+  { id: 'mirror', roman: 'III', short: 'Mirror' },
+  { id: 'residual', roman: 'IV', short: 'Residual' },
+  { id: 'retained', roman: 'V', short: 'Retained' },
+  { id: 'physical', roman: 'VI', short: 'Physical' },
+  { id: 'epistemic', roman: 'VII', short: 'Epistemic' },
+]
+
 export type FiberNode = {
   id: string
   label: string
@@ -19,6 +43,8 @@ export type FiberNode = {
   mtimeAgeDays?: number
   mimeKind?: MimeKind
   bucket?: DriveBucket
+  /** Never Again braid family — secondary to C/S residual */
+  strand?: FiberStrand
 }
 
 export type FiberEdge = {
@@ -38,7 +64,7 @@ export type FiberSort = {
   watchIds?: string[]
   ignoreIds?: string[]
   /** 'drive' → viz settles on keep/watch/ignore foci */
-  clusterMode?: 'cs' | 'drive'
+  clusterMode?: 'cs' | 'drive' | 'braid'
 }
 
 export function residualOf(n: Pick<FiberNode, 'claimed' | 'source'>): number {
@@ -406,6 +432,130 @@ export function formatBytes(n: number): string {
 }
 
 
+
+/** Strand family hue — 7 braid fibers (not folder labels) */
+export function strandColor(strand: FiberStrand): string {
+  switch (strand) {
+    case 'observation':
+      return '#7ad4ff' // I cyan-ice
+    case 'primary':
+      return '#3dfff0' // II cyan
+    case 'mirror':
+      return '#b44dff' // III violet
+    case 'residual':
+      return '#ffb020' // IV amber residual
+    case 'retained':
+      return '#5dff9a' // V green consequence
+    case 'physical':
+      return '#4d7dff' // VI blue ledger
+    case 'epistemic':
+      return '#e8f4ff' // VII white epistemic
+    default:
+      return '#8a9bb8'
+  }
+}
+
+/** Weave edges within each strand family (7 org couplings). */
+function weaveStrandEdges(nodes: FiberNode[]): FiberEdge[] {
+  const byStrand = new Map<FiberStrand, string[]>()
+  for (const n of nodes) {
+    if (!n.strand) continue
+    const list = byStrand.get(n.strand) ?? []
+    list.push(n.id)
+    byStrand.set(n.strand, list)
+  }
+  const byId = new Map(nodes.map((n) => [n.id, n]))
+  const edges: FiberEdge[] = []
+  const seen = new Set<string>()
+  const push = (from: string, to: string) => {
+    if (from === to) return
+    const key = from < to ? `${from}|${to}` : `${to}|${from}`
+    if (seen.has(key)) return
+    seen.add(key)
+    const n = byId.get(from)
+    if (!n) return
+    edges.push({ from, to, residual: residualOf(n) })
+  }
+  for (const ids of byStrand.values()) {
+    if (ids.length < 2) continue
+    for (let i = 0; i < ids.length; i++) {
+      push(ids[i], ids[(i + 1) % ids.length])
+      if (ids.length >= 4) push(ids[i], ids[(i + 2) % ids.length])
+    }
+  }
+  return edges
+}
+
+/**
+ * Never Again demo braid — 7 strand families × units with C/S residual.
+ * Settles to GRANT/REFUSE foci only (clusterMode braid/cs). No Class E/F mythos.
+ */
+export function buildNeverAgainBraidSort(): FiberSort {
+  // Parallel C/S per strand — some GRANT, some REFUSE (residual overage)
+  const units: Array<{ strand: FiberStrand; claimed: number; source: number; tag: string }> = [
+    // I Observation
+    { strand: 'observation', claimed: 12, source: 14, tag: 'O1' },
+    { strand: 'observation', claimed: 8, source: 8, tag: 'O2' },
+    { strand: 'observation', claimed: 22, source: 18, tag: 'O3' }, // refuse
+    // II Primary
+    { strand: 'primary', claimed: 40, source: 50, tag: 'P1' },
+    { strand: 'primary', claimed: 33, source: 33, tag: 'P2' },
+    { strand: 'primary', claimed: 61, source: 55, tag: 'P3' }, // refuse
+    // III Mirror (anti self-confirm)
+    { strand: 'mirror', claimed: 40, source: 52, tag: 'M1' },
+    { strand: 'mirror', claimed: 33, source: 30, tag: 'M2' }, // refuse vs primary
+    { strand: 'mirror', claimed: 55, source: 55, tag: 'M3' },
+    // IV Residual
+    { strand: 'residual', claimed: 5, source: 10, tag: 'R1' },
+    { strand: 'residual', claimed: 14, source: 9, tag: 'R2' }, // refuse
+    { strand: 'residual', claimed: 0, source: 3, tag: 'R3' },
+    // V Retained Consequence
+    { strand: 'retained', claimed: 20, source: 25, tag: 'S1' },
+    { strand: 'retained', claimed: 28, source: 22, tag: 'S2' }, // refuse
+    { strand: 'retained', claimed: 15, source: 15, tag: 'S3' },
+    // VI Physical Ledger
+    { strand: 'physical', claimed: 100, source: 100, tag: 'Ph1' },
+    { strand: 'physical', claimed: 101, source: 100, tag: 'Ph2' }, // refuse $1
+    { strand: 'physical', claimed: 90, source: 110, tag: 'Ph3' },
+    // VII Epistemic Ledger — Claimed ≤ Interior
+    { strand: 'epistemic', claimed: 7, source: 9, tag: 'E1' },
+    { strand: 'epistemic', claimed: 11, source: 10, tag: 'E2' }, // refuse
+    { strand: 'epistemic', claimed: 4, source: 4, tag: 'E3' },
+  ]
+  const nodes: FiberNode[] = units.map((u, i) => ({
+    id: `braid-${u.strand}-${i}`,
+    label: `${FIBER_STRANDS.find((s) => s.id === u.strand)?.roman ?? '?'}-${u.tag}`,
+    claimed: u.claimed,
+    source: u.source,
+    kind: 'demo' as const,
+    strand: u.strand,
+  }))
+  const grantIds: string[] = []
+  const refuseIds: string[] = []
+  for (const n of nodes) {
+    if (isGrantNode(n)) grantIds.push(n.id)
+    else refuseIds.push(n.id)
+  }
+  const strandEdges = weaveStrandEdges(nodes)
+  const csEdges = weaveEdges(nodes, grantIds, refuseIds)
+  // prefer strand family edges; pad with C/S if thin
+  const seen = new Set(strandEdges.map((e) => (e.from < e.to ? `${e.from}|${e.to}` : `${e.to}|${e.from}`)))
+  const edges = [...strandEdges]
+  for (const e of csEdges) {
+    const key = e.from < e.to ? `${e.from}|${e.to}` : `${e.to}|${e.from}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    edges.push(e)
+  }
+  return {
+    nodes,
+    edges,
+    grantIds,
+    refuseIds,
+    clusterMode: 'braid',
+  }
+}
+
 export type FiberBucket = 'grant' | 'refuse' | 'keep' | 'watch' | 'ignore'
 
 export function bucketOf(n: FiberNode): FiberBucket {
@@ -414,6 +564,15 @@ export function bucketOf(n: FiberNode): FiberBucket {
 }
 
 export function fiberColor(n: FiberNode): string {
+  // Never Again braid: strand family hue, severity via residual still on edges
+  if (n.strand) {
+    const base = strandColor(n.strand)
+    if (!isGrantNode(n)) {
+      // refuse — pull toward rose without losing strand identity
+      return n.strand === 'residual' ? '#ff6b8a' : base
+    }
+    return base
+  }
   const b = bucketOf(n)
   switch (b) {
     case 'grant':

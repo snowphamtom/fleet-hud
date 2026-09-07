@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   buildDemoDriveFiberSort,
   buildFiberSort,
+  buildNeverAgainBraidSort,
   fiberVerdict,
   type FiberSort,
 } from '../lib/fiber'
@@ -96,11 +97,40 @@ export function SortingDemo({ ledger, onSort }: Props) {
       fiber,
     })
   }
+  function runBraid() {
+    const fiber = buildNeverAgainBraidSort()
+    const claimed = fiber.nodes.map((n) => n.claimed)
+    const source = fiber.nodes.map((n) => n.source)
+    const result = sortClaim(claimed, source)
+    const verdict = fiber.refuseIds.length ? 'REFUSE' : fiberVerdict(fiber)
+    setClaimedRaw(claimed.slice(0, 8).join(', ') + ', …')
+    setSourceRaw(source.slice(0, 8).join(', ') + ', …')
+    setLast(result)
+    onSort({
+      id: makeId(),
+      at: Date.now(),
+      label: `Never Again braid · 7 strands · ${fiber.nodes.length} units`,
+      verdict,
+      result: {
+        ...result,
+        verdict,
+        lines: fiber.nodes.map((n, i) => ({
+          index: i,
+          claimed: n.claimed,
+          source: n.source,
+          ok: n.claimed <= n.source,
+          overage: Math.max(0, n.claimed - n.source),
+        })),
+      },
+      fiber,
+    })
+  }
+
 
   return (
     <section className="sorting-block">
       <SectionLabel title="TRY" value="C ≤ S" accent />
-      <p className="try-hint">Tap Demo GRANT / Demo REFUSE / Demo Drive Sort — metrics → keep/watch/ignore.</p>
+      <p className="try-hint">Tap Demo GRANT / REFUSE / Drive / Braid 7 (Never Again → C≤S) — metrics → keep/watch/ignore.</p>
       <div className="demo-row">
         <button
           type="button"
@@ -118,6 +148,9 @@ export function SortingDemo({ ledger, onSort }: Props) {
         </button>
         <button type="button" className="btn primary" onClick={runDriveWeb}>
           Demo Drive Sort
+        </button>
+        <button type="button" className="btn grant" onClick={runBraid}>
+          Demo Braid 7
         </button>
       </div>
 
