@@ -9,7 +9,7 @@ export function GrokStub() {
       <p className="stub-body">{ALL_GAS.grok.panel}</p>
       <div className="stub-chips">
         <span className="pill">{ALL_GAS.grok.model}</span>
-        <span className="pill">{convexReady ? 'Convex env' : 'Convex pending'}</span>
+        <span className="pill">{convexReady ? 'Convex configured' : 'Convex pending'}</span>
         <span className="pill">Firecrawl stub</span>
         <span className="pill">AgentMail stub</span>
       </div>
@@ -19,8 +19,10 @@ export function GrokStub() {
           <dd>
             {ALL_GAS.convex.url}
             {!convexReady ? (
-              <span className="dim"> · set VITE_CONVEX_URL (Heavy NEW backend)</span>
-            ) : null}
+              <span className="dim"> · set VITE_CONVEX_URL</span>
+            ) : (
+              <span className="dim"> · live</span>
+            )}
           </dd>
         </div>
         <div>

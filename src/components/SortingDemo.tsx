@@ -7,6 +7,8 @@ import {
   loadPublicDriveSortSample,
   type FiberSort,
 } from '../lib/fiber'
+import { ALL_GAS } from '../lib/config'
+import { pushDemoEvidence, runSortConvex } from '../lib/convexClient'
 import {
   DEMO_GRANT,
   DEMO_REFUSE,
@@ -25,6 +27,8 @@ export type LedgerEntry = {
   result: SortResult
   /** Numbers-first spider web — drives torus clusters / fiber edges */
   fiber: FiberSort
+  /** Where the verdict came from when Convex is wired */
+  source?: 'convex' | 'local'
 }
 
 type Props = {
@@ -40,6 +44,9 @@ export function SortingDemo({ ledger, onSort }: Props) {
   const [claimedRaw, setClaimedRaw] = useState(DEMO_GRANT.claimed.join(', '))
   const [sourceRaw, setSourceRaw] = useState(DEMO_GRANT.source.join(', '))
   const [last, setLast] = useState<SortResult | null>(null)
+  const [via, setVia] = useState<'convex' | 'local' | null>(null)
+  const [busy, setBusy] = useState(false)
+  const [evidenceMsg, setEvidenceMsg] = useState<string | null>(null)
 
   const preview = useMemo(() => {
     const c = parseNums(claimedRaw)
@@ -48,26 +55,44 @@ export function SortingDemo({ ledger, onSort }: Props) {
     return sortClaim(c, s)
   }, [claimedRaw, sourceRaw])
 
-  function run(label: string, claimed: number[], source: number[]) {
-    const result = sortClaim(claimed, source)
-    setClaimedRaw(claimed.join(', '))
-    setSourceRaw(source.join(', '))
-    setLast(result)
-    onSort({
-      id: makeId(),
-      at: Date.now(),
-      label,
-      verdict: result.verdict,
-      result,
-      fiber: buildFiberSort(claimed, source, { kind: 'demo', labelPrefix: 'L' }),
-    })
+  async function resolveSort(claimed: number[], source: number[]): Promise<{
+    result: SortResult
+    source: 'convex' | 'local'
+  }> {
+    if (ALL_GAS.convex.configured) {
+      const remote = await runSortConvex(claimed, source)
+      if (remote) return { result: remote, source: 'convex' }
+    }
+    return { result: sortClaim(claimed, source), source: 'local' }
+  }
+
+  async function run(label: string, claimed: number[], source: number[]) {
+    setBusy(true)
+    try {
+      const { result, source: src } = await resolveSort(claimed, source)
+      setClaimedRaw(claimed.join(', '))
+      setSourceRaw(source.join(', '))
+      setLast(result)
+      setVia(src)
+      onSort({
+        id: makeId(),
+        at: Date.now(),
+        label: src === 'convex' ? `${label} · Convex` : label,
+        verdict: result.verdict,
+        result,
+        fiber: buildFiberSort(claimed, source, { kind: 'demo', labelPrefix: 'L' }),
+        source: src,
+      })
+    } finally {
+      setBusy(false)
+    }
   }
 
   function runCurrent() {
     const c = parseNums(claimedRaw)
     const s = parseNums(sourceRaw)
     if (!c.length || !s.length) return
-    run('Manual sort', c, s)
+    void run('Manual sort', c, s)
   }
 
   function runDriveWeb() {
@@ -78,11 +103,11 @@ export function SortingDemo({ ledger, onSort }: Props) {
       claimed.length ? claimed : [0],
       source.length ? source : [0],
     )
-    // Prefer Drive metrics verdict from buckets
     const verdict = fiber.refuseIds.length ? 'REFUSE' : fiberVerdict(fiber)
     setClaimedRaw(claimed.slice(0, 8).join(', ') + (claimed.length > 8 ? ', …' : ''))
     setSourceRaw(source.slice(0, 8).join(', ') + (source.length > 8 ? ', …' : ''))
     setLast(result)
+    setVia('local')
     onSort({
       id: makeId(),
       at: Date.now(),
@@ -96,6 +121,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
         overage: Math.max(0, n.claimed - n.source),
       })) },
       fiber,
+      source: 'local',
     })
   }
   function runBraid() {
@@ -107,6 +133,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
     setClaimedRaw(claimed.slice(0, 8).join(', ') + ', …')
     setSourceRaw(source.slice(0, 8).join(', ') + ', …')
     setLast(result)
+    setVia('local')
     onSort({
       id: makeId(),
       at: Date.now(),
@@ -124,10 +151,9 @@ export function SortingDemo({ ledger, onSort }: Props) {
         })),
       },
       fiber,
+      source: 'local',
     })
   }
-
-
 
   async function runDriveJson() {
     const fiber = await loadPublicDriveSortSample('/data-test-sort-sample.json')
@@ -142,6 +168,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
     setClaimedRaw(claimed.slice(0, 6).join(', ') + (claimed.length > 6 ? ', …' : ''))
     setSourceRaw(source.slice(0, 6).join(', ') + (source.length > 6 ? ', …' : ''))
     setLast(result)
+    setVia('local')
     onSort({
       id: makeId(),
       at: Date.now(),
@@ -159,41 +186,71 @@ export function SortingDemo({ ledger, onSort }: Props) {
         })),
       },
       fiber,
+      source: 'local',
     })
+  }
+
+  async function onPushEvidence() {
+    if (!ALL_GAS.convex.configured) {
+      setEvidenceMsg('Convex offline')
+      return
+    }
+    setBusy(true)
+    setEvidenceMsg('Pushing…')
+    try {
+      const id = await pushDemoEvidence()
+      setEvidenceMsg(id ? `Evidence ok · ${id.slice(0, 12)}…` : 'Push failed · soft')
+    } finally {
+      setBusy(false)
+    }
   }
 
   return (
     <section className="sorting-block">
       <SectionLabel title="TRY" value="C ≤ S" accent />
-      <p className="try-hint">Tap Demo GRANT / REFUSE / Drive / Braid 7 (Never Again → C≤S) — metrics → keep/watch/ignore.</p>
+      <p className="try-hint">
+        Tap Demo GRANT / REFUSE / Drive / Braid 7 — metrics → keep/watch/ignore
+        {ALL_GAS.convex.configured ? ' · Convex live' : ' · local sort'}.
+      </p>
       <div className="demo-row">
         <button
           type="button"
           className="btn grant grant-btn"
-          onClick={() => run(DEMO_GRANT.label, DEMO_GRANT.claimed, DEMO_GRANT.source)}
+          disabled={busy}
+          onClick={() => void run(DEMO_GRANT.label, DEMO_GRANT.claimed, DEMO_GRANT.source)}
         >
           Demo GRANT
         </button>
         <button
           type="button"
           className="btn refuse refuse-btn"
-          onClick={() => run(DEMO_REFUSE.label, DEMO_REFUSE.claimed, DEMO_REFUSE.source)}
+          disabled={busy}
+          onClick={() => void run(DEMO_REFUSE.label, DEMO_REFUSE.claimed, DEMO_REFUSE.source)}
         >
           Demo REFUSE
         </button>
-        <button type="button" className="btn primary" onClick={runDriveWeb}>
+        <button type="button" className="btn primary" disabled={busy} onClick={runDriveWeb}>
           Demo Drive Sort
         </button>
-        <button type="button" className="btn ghost" onClick={() => void runDriveJson()}>
+        <button type="button" className="btn ghost" disabled={busy} onClick={() => void runDriveJson()}>
           Load Drive JSON
         </button>
-        <button type="button" className="btn grant" onClick={runBraid}>
+        <button type="button" className="btn grant" disabled={busy} onClick={runBraid}>
           Demo Braid 7
         </button>
+        {ALL_GAS.convex.configured ? (
+          <button type="button" className="btn ghost" disabled={busy} onClick={() => void onPushEvidence()}>
+            Push evidence
+          </button>
+        ) : null}
       </div>
+      {evidenceMsg ? <p className="try-hint">{evidenceMsg}</p> : null}
 
       <article className="panel sort-shell">
-        <SectionLabel title="SORTING MACHINE — LIVE" />
+        <SectionLabel
+          title="SORTING MACHINE — LIVE"
+          value={via === 'convex' ? 'Convex' : via === 'local' ? 'local' : undefined}
+        />
         <div className="stage-crumb">
           // 1. Intake · 2. Filter · 3. Evidence · 4. Verdict · 5. Store
         </div>
@@ -223,6 +280,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
               setClaimedRaw(DEMO_GRANT.claimed.join(', '))
               setSourceRaw(DEMO_GRANT.source.join(', '))
               setLast(null)
+              setVia(null)
             }}
           >
             Load GRANT
@@ -234,11 +292,12 @@ export function SortingDemo({ ledger, onSort }: Props) {
               setClaimedRaw(DEMO_REFUSE.claimed.join(', '))
               setSourceRaw(DEMO_REFUSE.source.join(', '))
               setLast(null)
+              setVia(null)
             }}
           >
             Load REFUSE
           </button>
-          <button type="button" className="btn primary" onClick={runCurrent}>
+          <button type="button" className="btn primary" disabled={busy} onClick={runCurrent}>
             SORT C ≤ S
           </button>
         </div>
@@ -261,6 +320,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
                 <div className="fiber-meta panel-foot">
                   fiber · G={fiber.grantIds.length} R={fiber.refuseIds.length} ·{' '}
                   {fiber.edges.length} edges (residual)
+                  {via ? ` · via ${via}` : ''}
                 </div>
               )
             })()}
@@ -280,6 +340,7 @@ export function SortingDemo({ ledger, onSort }: Props) {
                   <strong>{e.label}</strong>
                   <span className="ledger-meta">
                     {new Date(e.at).toLocaleTimeString()} · {e.result.lines.length} lines
+                    {e.source ? ` · ${e.source}` : ''}
                   </span>
                   <div className="chip-row">
                     {e.result.lines.map((line) => (

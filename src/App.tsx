@@ -91,7 +91,7 @@ export default function App() {
               installable shell for the All Gas stack.
             </p>
             <div className="stack-chips">
-              <span className="pill">CONVEX</span>
+              <span className="pill">{ALL_GAS.convex.configured ? 'CONVEX live' : 'CONVEX'}</span>
               <span className="pill">FIRECRAWL</span>
               <span className="pill">AGENTMAIL</span>
               <span className="pill">GROK stub</span>

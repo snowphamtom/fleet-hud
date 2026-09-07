@@ -1,4 +1,4 @@
-/** All Gas stack stubs — env only. Never attach quirky-rhinoceros; Heavy owns NEW Convex. */
+/** All Gas stack — Convex URL from VITE_*; Heavy owns fleet-gerbil-682. */
 const PLACEHOLDER_CLOUD = 'https://YOUR_DEPLOYMENT.convex.cloud'
 const PLACEHOLDER_SITE = 'https://YOUR_DEPLOYMENT.convex.site'
 
@@ -15,7 +15,7 @@ export const ALL_GAS = {
   convex: {
     url: envOr('VITE_CONVEX_URL', PLACEHOLDER_CLOUD),
     site: envOr('VITE_CONVEX_SITE', PLACEHOLDER_SITE),
-    /** False until Heavy sets VITE_CONVEX_URL on Pages / local .env */
+    /** True when VITE_CONVEX_URL points at a real deployment */
     configured: !isPlaceholder(envOr('VITE_CONVEX_URL', PLACEHOLDER_CLOUD)),
   },
   firecrawl: {
