@@ -1590,12 +1590,12 @@
 /* ══ Sort-coupled torus node motion ═══════════════════════════════════ */
 .dendrite-mesh[data-sorting='1'] .cluster-hint {
   opacity: 1;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.28s ease; /* hyper-speed — match a73950e snappiness */
 }
 .dendrite-mesh .cluster-hint {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.42s ease;
 }
 .dendrite-mesh[data-sorting='1'] {
   filter:
@@ -1604,7 +1604,8 @@
     drop-shadow(0 8px 20px rgba(0, 0, 0, 0.45));
 }
 .dendrite-sort-nodes[data-phase='scramble'] .sort-node,
-.dendrite-sort-nodes[data-phase='sorting'] .sort-node {
+.dendrite-sort-nodes[data-phase='sorting'] .sort-node,
+.dendrite-sort-nodes[data-phase='settled'] .sort-node {
   /* rAF drives cx/cy; keep GPU-friendly */
   will-change: cx, cy;
 }
@@ -1617,6 +1618,81 @@
   );
 }
 
+/* ══ 5-bucket settle polish — GRANT/REFUSE/keep/watch/ignore ══════════ */
+@keyframes bucket-settle-pulse {
+  0%,
+  100% {
+    stroke-opacity: 0.55;
+    fill-opacity: 0.08;
+  }
+  50% {
+    stroke-opacity: 0.95;
+    fill-opacity: 0.16;
+  }
+}
+.dendrite-mesh[data-sorting='1'] .cluster-hint[data-bucket='grant'] {
+  animation: bucket-settle-pulse 0.42s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(61, 255, 240, 0.35));
+}
+.dendrite-mesh[data-sorting='1'] .cluster-hint[data-bucket='refuse'] {
+  animation: bucket-settle-pulse 0.42s ease-in-out 0.05s infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 107, 138, 0.35));
+}
+.dendrite-mesh[data-sorting='1'] .cluster-hint[data-bucket='keep'] {
+  animation: bucket-settle-pulse 0.38s ease-in-out 0.08s infinite;
+  filter: drop-shadow(0 0 5px rgba(93, 255, 154, 0.32));
+}
+.dendrite-mesh[data-sorting='1'] .cluster-hint[data-bucket='watch'] {
+  animation: bucket-settle-pulse 0.4s ease-in-out 0.1s infinite;
+  filter: drop-shadow(0 0 5px rgba(180, 77, 255, 0.32));
+}
+.dendrite-mesh[data-sorting='1'] .cluster-hint[data-bucket='ignore'] {
+  animation: bucket-settle-pulse 0.48s ease-in-out 0.12s infinite;
+  filter: drop-shadow(0 0 4px rgba(90, 106, 136, 0.28));
+}
+
+/* Settled phase: hold foci brighter, still hyper-snappy fade */
+.dendrite-sort-nodes[data-phase='settled'] ~ .cluster-hint,
+.dendrite-mesh:has(.dendrite-sort-nodes[data-phase='settled']) .cluster-hint {
+  opacity: 1;
+}
+
+/* Node color/weight cues from DATA attrs (rAF still owns fill; CSS softens) */
+.dendrite-sort-nodes .sort-node[data-bucket='grant'] {
+  filter: drop-shadow(0 0 2.2px rgba(61, 255, 240, 0.55));
+}
+.dendrite-sort-nodes .sort-node[data-bucket='refuse'] {
+  filter: drop-shadow(0 0 2.2px rgba(255, 107, 138, 0.55));
+}
+.dendrite-sort-nodes .sort-node[data-bucket='keep'] {
+  filter: drop-shadow(0 0 2px rgba(93, 255, 154, 0.5));
+}
+.dendrite-sort-nodes .sort-node[data-bucket='watch'] {
+  filter: drop-shadow(0 0 2px rgba(180, 77, 255, 0.5));
+}
+.dendrite-sort-nodes .sort-node[data-bucket='ignore'] {
+  filter: drop-shadow(0 0 1.6px rgba(90, 106, 136, 0.45));
+}
+
+/* Click → evidence: style hooks, don't break hit targets (phone-first) */
+.fiber-web {
+  pointer-events: none;
+}
+.dendrite-sort-nodes {
+  cursor: pointer;
+}
+.dendrite-sort-nodes .sort-node {
+  /* enlarge effective tap without changing rAF radius math */
+  stroke: transparent;
+  stroke-width: 8;
+  paint-order: stroke fill;
+  transition: filter 0.18s ease;
+}
+.dendrite-sort-nodes .sort-node:active,
+.dendrite-sort-nodes .sort-node[data-fiber]:hover {
+  filter: drop-shadow(0 0 4px rgba(232, 251, 255, 0.75));
+}
+
 .fiber-evidence {
   margin: 6px 0 0;
   font-family: var(--mono);
@@ -1625,13 +1701,6 @@
   color: var(--mute);
   text-align: center;
 }
-.fiber-web {
-  pointer-events: none;
-}
-.dendrite-sort-nodes {
-  cursor: pointer;
-}
-
 
 /* Drive spider-web evidence — data chip, not costume */
 .fiber-evidence-panel {
@@ -1639,6 +1708,7 @@
   padding: 0.7rem 0.8rem;
   border: 1px solid rgba(61, 255, 240, 0.22);
   background: rgba(6, 10, 18, 0.92);
+  border-radius: 8px;
 }
 .fiber-evidence-head {
   display: flex;
@@ -1693,9 +1763,47 @@
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
-.bucket-chip.grant { color: #3dfff0; border-color: rgba(61, 255, 240, 0.35); }
-.bucket-chip.refuse { color: #ff6b8a; border-color: rgba(255, 107, 138, 0.35); }
-.bucket-chip.keep { color: #5dff9a; border-color: rgba(93, 255, 154, 0.35); }
-.bucket-chip.watch { color: #b44dff; border-color: rgba(180, 77, 255, 0.35); }
-.bucket-chip.ignore { color: #8a9bb8; border-color: rgba(90, 106, 136, 0.4); }
+.bucket-chip.grant { color: #3dfff0; border-color: rgba(61, 255, 240, 0.35); background: rgba(61, 255, 240, 0.06); }
+.bucket-chip.refuse { color: #ff6b8a; border-color: rgba(255, 107, 138, 0.35); background: rgba(255, 107, 138, 0.06); }
+.bucket-chip.keep { color: #5dff9a; border-color: rgba(93, 255, 154, 0.35); background: rgba(93, 255, 154, 0.06); }
+.bucket-chip.watch { color: #b44dff; border-color: rgba(180, 77, 255, 0.35); background: rgba(180, 77, 255, 0.06); }
+.bucket-chip.ignore { color: #8a9bb8; border-color: rgba(90, 106, 136, 0.4); background: rgba(90, 106, 136, 0.08); }
+
+/* Phone-first clarity for Drive Sort buckets + evidence */
+@media (max-width: 430px) {
+  .dendrite-mesh[data-sorting='1'] {
+    filter:
+      drop-shadow(0 0 12px rgba(61, 255, 240, 0.34))
+      drop-shadow(0 0 10px rgba(255, 107, 138, 0.2))
+      drop-shadow(0 6px 14px rgba(0, 0, 0, 0.5));
+  }
+  .bucket-chips {
+    gap: 0.28rem;
+  }
+  .bucket-chip {
+    font-size: 0.64rem;
+    padding: 0.2rem 0.45rem;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .fiber-evidence-panel {
+    padding: 0.65rem 0.7rem;
+  }
+  .fiber-evidence-grid dd {
+    font-size: 0.78rem;
+  }
+  .dendrite-sort-nodes .sort-node {
+    stroke-width: 10;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dendrite-mesh[data-sorting='1'] .cluster-hint[data-bucket] {
+    animation: none;
+  }
+}

@@ -2,8 +2,9 @@
  * Torus mesh + SSB/Dandelin sort-core.
  * Idle: symmetric ring near φ=0 (Goldstone tangential drift).
  * Sort: scramble → vacuum selection — nodes migrate along cone
- * generators toward GRANT (F, cyan) or REFUSE (F′, rose) foci
- * of the plane∩cone ellipse. Phone-ok rAF + SVG attr mutation.
+ * generators toward 5 bucket foci (GRANT/REFUSE/keep/watch/ignore).
+ * Color/weight/speed from residual·C/S·size·mtime·mime DATA.
+ * Phone-ok rAF + SVG attr mutation; click→evidence hooks preserved.
  */
 import { useEffect, useMemo, useRef } from 'react'
 import {
@@ -141,6 +142,11 @@ type Movable = {
   color: string
   /** 0..1 normalized data weight from metrics */
   weight: number
+  /** Hyper-speed multiplier from residual/size/mtime — heavier settles first */
+  sortSpeed: number
+  mimeKind: string
+  sizeBytes: number
+  mtimeAgeDays: number
 }
 
 function buildMesh() {
@@ -305,6 +311,10 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
       bucket: 'ignore',
       color: '#5a6a88',
       weight: 0.15,
+      sortSpeed: 1,
+      mimeKind: '',
+      sizeBytes: 0,
+      mtimeAgeDays: 0,
     }))
   }, [mesh])
 
@@ -351,10 +361,14 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
       const focus = FOCUS[bucket]
       // DATA weight: |residual| + size + (1-freshness) — not label text
       const wRes = Math.min(1, Math.abs(residual) / maxAbsRes)
+      const sw = sizeWeight(node)
+      const fresh = freshnessOf(node)
       const weight = Math.min(
         1,
-        0.18 + 0.42 * wRes + 0.25 * sizeWeight(node) + 0.2 * (1 - freshnessOf(node)),
+        0.18 + 0.42 * wRes + 0.25 * sw + 0.2 * (1 - fresh),
       )
+      // DATA speed: residual + size + staleness — never label text
+      const sortSpeed = Math.min(1.35, Math.max(0.72, 0.7 + weight * 0.55 + (1 - fresh) * 0.12))
       const burstAng = m.theta + (hash(m.id, sortKey) - 0.5) * 2.2
       const burstR = 10 + weight * 58 + hash(m.id, sortKey + 3) * 16
       const scramble = {
@@ -383,6 +397,10 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
         bucket,
         color: fiberColor(node),
         weight,
+        sortSpeed,
+        mimeKind: node.mimeKind ?? '',
+        sizeBytes: node.sizeBytes ?? 0,
+        mtimeAgeDays: node.mtimeAgeDays ?? 0,
       }
     })
 
@@ -475,17 +493,24 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
             const m = movables[i]
             const el = els[i]
             if (!el) continue
-            // migrate along cone generator (quadratic toward focus)
-            const p = qBez(m.scramble, m.ctrl, m.target, t)
+            // per-node hyper-speed from residual/size/mtime weight
+            const localT = easeInOut(Math.min(1, t * m.sortSpeed))
+            const p = qBez(m.scramble, m.ctrl, m.target, localT)
             el.setAttribute('cx', String(p.x))
             el.setAttribute('cy', String(p.y))
-            el.setAttribute('r', String((1.4 + m.weight * 2.2) * (1 - t * 0.15)))
+            el.setAttribute('r', String((1.4 + m.weight * 2.2) * (1 - localT * 0.15)))
             el.setAttribute('fill', m.color)
-            el.setAttribute('opacity', String(0.78 + t * 0.22))
+            el.setAttribute('opacity', String(0.78 + localT * 0.22))
             el.setAttribute('data-line', String(m.lineIndex))
             el.setAttribute('data-bucket', m.bucket)
             el.setAttribute('data-overage', String(m.overage))
             el.setAttribute('data-weight', m.weight.toFixed(3))
+            el.setAttribute('data-speed', m.sortSpeed.toFixed(3))
+            if (m.mimeKind) el.setAttribute('data-mime', m.mimeKind)
+            if (m.sizeBytes) el.setAttribute('data-size', String(m.sizeBytes))
+            if (m.mtimeAgeDays) el.setAttribute('data-mtime', String(m.mtimeAgeDays))
+            if (m.fiberId) el.setAttribute('data-fiber', m.fiberId)
+            el.setAttribute('data-residual', String(m.residual))
           }
           // Spider-web from FiberSort.edges — residual drives stroke weight/color
           const fiberG = svgRef.current?.querySelector('.fiber-web') as SVGGElement | null
@@ -560,39 +585,77 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
           if (geomRef.current) geomRef.current.setAttribute('opacity', '0.9')
         } else if (elapsed < T_SCRAMBLE + T_SORT + T_SETTLE_HOLD) {
           nextPhase = 'settled'
+          const settleT = (elapsed - T_SCRAMBLE - T_SORT) / T_SETTLE_HOLD
           for (let i = 0; i < movables.length; i++) {
             const m = movables[i]
             const el = els[i]
             if (!el) continue
-            // Goldstone tangential drift around focus + radial restore
+            // 5-bucket Goldstone: drift rate/amplitude from DATA weight
             const focus = FOCUS[m.bucket] ?? FOCUS_GRANT
             const dx = m.target.x - focus.x
             const dy = m.target.y - focus.y
             const rad = Math.hypot(dx, dy) || 1
             const baseAng = Math.atan2(dy, dx)
-            const drift = now * 0.0011 + m.id * 0.15
-            const ang = baseAng + Math.sin(drift) * 0.18
-            // radial restore: spring slightly toward focus radius
-            const rTarget = rad
-            const rNow = rTarget + Math.sin(drift * 1.3) * 0.6
+            const driftRate = 0.0009 + m.weight * 0.0007
+            const drift = now * driftRate + m.id * 0.15
+            const amp = 0.12 + m.weight * 0.14
+            const ang = baseAng + Math.sin(drift) * amp
+            const rNow = rad + Math.sin(drift * 1.3) * (0.45 + m.weight * 0.55)
             const gx = focus.x + Math.cos(ang) * rNow
             const gy = focus.y + Math.sin(ang) * rNow * 0.92
             el.setAttribute('cx', String(gx))
             el.setAttribute('cy', String(gy))
-            el.setAttribute('r', String(1.5 + m.weight * 1.1))
+            // settle pulse: weight + residual mass → radius / opacity
+            const pulse = 1 + Math.sin(now * 0.008 + m.id) * 0.06 * m.weight
+            el.setAttribute('r', String((1.45 + m.weight * 1.25) * pulse))
             el.setAttribute('fill', m.color)
-            el.setAttribute('opacity', '0.98')
+            el.setAttribute('opacity', String(0.9 + settleT * 0.08))
             if (m.fiberId) el.setAttribute('data-fiber', m.fiberId)
             el.setAttribute('data-line', String(m.lineIndex))
             el.setAttribute('data-bucket', m.bucket)
             el.setAttribute('data-residual', String(m.residual))
+            el.setAttribute('data-weight', m.weight.toFixed(3))
+            if (m.mimeKind) el.setAttribute('data-mime', m.mimeKind)
+            if (m.sizeBytes) el.setAttribute('data-size', String(m.sizeBytes))
+            if (m.mtimeAgeDays) el.setAttribute('data-mtime', String(m.mtimeAgeDays))
+          }
+          // Keep spider-web endpoints glued to drifting nodes during settle
+          const fiberG = svgRef.current?.querySelector('.fiber-web') as SVGGElement | null
+          if (fiberG && fiberG.childElementCount) {
+            const byId = new Map<string, { x: number; y: number }>()
+            for (let i = 0; i < movables.length; i++) {
+              const m = movables[i]
+              const el = els[i]
+              if (!el || !m.fiberId || byId.has(m.fiberId)) continue
+              byId.set(m.fiberId, {
+                x: Number(el.getAttribute('cx')),
+                y: Number(el.getAttribute('cy')),
+              })
+            }
+            const lines = fiberG.querySelectorAll('line[data-from]')
+            for (let li = 0; li < lines.length; li++) {
+              const line = lines[li] as SVGLineElement
+              const a = byId.get(line.getAttribute('data-from') ?? '')
+              const b = byId.get(line.getAttribute('data-to') ?? '')
+              if (!a || !b) continue
+              line.setAttribute('x1', String(a.x))
+              line.setAttribute('y1', String(a.y))
+              line.setAttribute('x2', String(b.x))
+              line.setAttribute('y2', String(b.y))
+              line.setAttribute('opacity', String(0.55 + Math.sin(now * 0.006 + li) * 0.08))
+            }
           }
           if (coreLabelRef.current) {
             coreLabelRef.current.textContent = verdictRef.current ?? 'C ≤ S'
           }
           if (coreSubRef.current) {
+            const mode = fiberSortRef.current?.clusterMode
             coreSubRef.current.textContent =
-              verdictRef.current === 'GRANT' ? 'GRANTED' : 'REFUSED'
+              mode === 'drive'
+                ? 'KEEP·WATCH·IGN'
+                : verdictRef.current === 'GRANT'
+                  ? 'GRANTED'
+                  : 'REFUSED'
           }
         } else if (elapsed < T_SCRAMBLE + T_SORT + T_SETTLE_HOLD + T_EASE_HOME) {
           nextPhase = 'settled'
@@ -790,6 +853,30 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
           strokeWidth="0.55"
           fill="rgba(255,107,138,0.08)"
         />
+        <circle
+          cx={FOCUS.keep.x}
+          cy={FOCUS.keep.y}
+          r="1.8"
+          stroke="rgba(93,255,154,0.5)"
+          strokeWidth="0.5"
+          fill="rgba(93,255,154,0.07)"
+        />
+        <circle
+          cx={FOCUS.watch.x}
+          cy={FOCUS.watch.y}
+          r="1.8"
+          stroke="rgba(180,77,255,0.5)"
+          strokeWidth="0.5"
+          fill="rgba(180,77,255,0.07)"
+        />
+        <circle
+          cx={FOCUS.ignore.x}
+          cy={FOCUS.ignore.y}
+          r="1.6"
+          stroke="rgba(90,106,136,0.55)"
+          strokeWidth="0.45"
+          fill="rgba(90,106,136,0.1)"
+        />
         {/* foci stay geometric; no costume letter labels — buckets are data clusters */}
       </g>
 
@@ -880,12 +967,12 @@ export function DendriteRing({ size = 240, sortKey = 0, fiberSort = null, lines,
         ))}
       </g>
 
-      {/* Bucket foci — color by data lane */}
-      <ellipse className="cluster-hint" cx={FOCUS.grant.x} cy={FOCUS.grant.y} rx="26" ry="28" fill="rgba(61,255,240,0.07)" stroke="rgba(61,255,240,0.3)" strokeWidth="0.55" />
-      <ellipse className="cluster-hint" cx={FOCUS.refuse.x} cy={FOCUS.refuse.y} rx="26" ry="28" fill="rgba(255,107,138,0.07)" stroke="rgba(255,107,138,0.3)" strokeWidth="0.55" />
-      <ellipse className="cluster-hint" cx={FOCUS.keep.x} cy={FOCUS.keep.y} rx="22" ry="20" fill="rgba(93,255,154,0.06)" stroke="rgba(93,255,154,0.28)" strokeWidth="0.5" />
-      <ellipse className="cluster-hint" cx={FOCUS.watch.x} cy={FOCUS.watch.y} rx="22" ry="20" fill="rgba(180,77,255,0.06)" stroke="rgba(180,77,255,0.28)" strokeWidth="0.5" />
-      <ellipse className="cluster-hint" cx={FOCUS.ignore.x} cy={FOCUS.ignore.y} rx="20" ry="16" fill="rgba(90,106,136,0.08)" stroke="rgba(90,106,136,0.35)" strokeWidth="0.45" />
+      {/* 5-bucket foci — GRANT/REFUSE/keep/watch/ignore (Create may light all five) */}
+      <ellipse className="cluster-hint" data-bucket="grant" cx={FOCUS.grant.x} cy={FOCUS.grant.y} rx="26" ry="28" fill="rgba(61,255,240,0.07)" stroke="rgba(61,255,240,0.3)" strokeWidth="0.55" />
+      <ellipse className="cluster-hint" data-bucket="refuse" cx={FOCUS.refuse.x} cy={FOCUS.refuse.y} rx="26" ry="28" fill="rgba(255,107,138,0.07)" stroke="rgba(255,107,138,0.3)" strokeWidth="0.55" />
+      <ellipse className="cluster-hint" data-bucket="keep" cx={FOCUS.keep.x} cy={FOCUS.keep.y} rx="22" ry="20" fill="rgba(93,255,154,0.06)" stroke="rgba(93,255,154,0.28)" strokeWidth="0.5" />
+      <ellipse className="cluster-hint" data-bucket="watch" cx={FOCUS.watch.x} cy={FOCUS.watch.y} rx="22" ry="20" fill="rgba(180,77,255,0.06)" stroke="rgba(180,77,255,0.28)" strokeWidth="0.5" />
+      <ellipse className="cluster-hint" data-bucket="ignore" cx={FOCUS.ignore.x} cy={FOCUS.ignore.y} rx="20" ry="16" fill="rgba(90,106,136,0.08)" stroke="rgba(90,106,136,0.35)" strokeWidth="0.45" />
 
       <circle
         ref={coreRingRef}
