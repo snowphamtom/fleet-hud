@@ -438,8 +438,8 @@
 /* ACTION HEAT */
 .heat-grid {
   display: grid;
-  grid-template-columns: repeat(14, 1fr);
-  gap: 3px;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  gap: 2px;
 }
 
 .heat-grid > span {
@@ -1022,4 +1022,92 @@
     min-height: 92px;
     padding: 9px 10px;
   }
+}
+
+/* VISUAL_QUIET — live Pages polish vs FUI ref */
+.hud-bar {
+  padding-top: max(12px, env(safe-area-inset-top));
+  padding-left: max(14px, env(safe-area-inset-left));
+  padding-right: max(14px, env(safe-area-inset-right));
+}
+
+.demo-row:not(.compact) > .btn.grant,
+.demo-row:not(.compact) > .btn.refuse {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+.result-strip {
+  min-height: 48px;
+  border-style: dashed;
+}
+
+.result-strip:has(.stamp) {
+  border-style: solid;
+  background: var(--panel);
+}
+
+.result-strip:has(.stamp.grant) {
+  border-color: color-mix(in srgb, var(--grant) 40%, var(--line));
+  background: color-mix(in srgb, var(--grant) 6%, white);
+}
+
+.result-strip:has(.stamp.refuse) {
+  border-color: color-mix(in srgb, var(--refuse) 40%, var(--line));
+  background: color-mix(in srgb, var(--refuse) 6%, white);
+}
+
+.fleet-modules .panel {
+  padding: 11px;
+}
+
+.hero-viz {
+  min-height: 248px;
+}
+
+.section-title {
+  color: color-mix(in srgb, var(--mute) 92%, var(--cyan));
+}
+
+@media (max-width: 375px) {
+  .fleet-modules {
+    gap: 8px;
+  }
+
+  .demo-row:not(.compact) {
+    flex-wrap: nowrap;
+  }
+
+  .btn.ghost {
+    flex: 1 1 auto;
+    min-height: 44px;
+  }
+
+  .demo-row.compact .btn.primary {
+    flex: 1 1 100%;
+  }
+}
+
+
+/* VISUAL_DENSITY — heat + throughput toward ref */
+.heat-grid > span {
+  min-height: 7px;
+  border-radius: 1.5px;
+}
+
+.thru-bars {
+  height: 64px;
+  gap: 2px;
+}
+
+.thru-bars > span {
+  border-radius: 1.5px 1.5px 0 0;
+  min-width: 2px;
+}
+
+.dendrite {
+  max-width: 100%;
 }

@@ -93,7 +93,7 @@ export default function App() {
             <span className="hero-float a">SUBNET_004</span>
             <span className="hero-float b">ACTIVE_CORE</span>
             <span className="hero-float c">TRACE_002</span>
-            <DendriteRing size={200} />
+            <DendriteRing size={268} />
           </div>
         </section>
 
@@ -161,6 +161,50 @@ export default function App() {
 
           <article className="panel">
             <div className="section-label">
+              <span className="section-title">// ACTION HEAT</span>
+            </div>
+            <div className="heat-grid" aria-hidden>
+              {Array.from({ length: 84 }, (_, i) => {
+                const base = metrics.heat[i % metrics.heat.length] ?? 0.2
+                // right-side heat cluster (GitHub-style recent activity)
+                const col = i % 14
+                const boost = col >= 10 ? 0.35 + (col - 10) * 0.12 : col >= 7 ? 0.08 : -0.12
+                const v = Math.min(1, Math.max(0.04, base * 0.55 + boost + ((i * 17) % 9) * 0.02))
+                const cool = v < 0.22
+                return (
+                  <span
+                    key={i}
+                    style={{
+                      background: cool
+                        ? `rgba(15,30,60,${0.04 + v * 0.12})`
+                        : `linear-gradient(135deg, rgba(0,194,255,${0.18 + v * 0.72}), rgba(122,61,255,${0.1 + v * 0.55}))`,
+                    }}
+                  />
+                )
+              })}
+            </div>
+          </article>
+
+          <article className="panel">
+            <div className="section-label">
+              <span className="section-title">// THROUGHPUT</span>
+              <span className="section-value">{metrics.throughput}/s</span>
+            </div>
+            <div className="thru-bars" aria-hidden>
+              {Array.from({ length: 28 }, (_, i) => {
+                const v = metrics.bars[i % metrics.bars.length] ?? 0.4
+                const jag = 0.55 + 0.45 * Math.sin(i * 1.7) * Math.cos(i * 0.55)
+                const h = Math.min(1, Math.max(0.12, v * jag))
+                return <span key={i} style={{ height: `${Math.round(h * 100)}%` }} />
+              })}
+            </div>
+            <div className="thru-pulse" aria-hidden />
+            <div className="panel-foot">
+              route health {metrics.routeHealth}% · // trace sync
+            </div>
+          </article>
+          <article className="panel">
+            <div className="section-label">
               <span className="section-title">// BOT STATUS</span>
               <span className="section-value">3/6</span>
             </div>
@@ -180,37 +224,6 @@ export default function App() {
             </ul>
           </article>
 
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// ACTION HEAT</span>
-            </div>
-            <div className="heat-grid" aria-hidden>
-              {metrics.heat.map((v, i) => (
-                <span
-                  key={i}
-                  style={{
-                    background: `linear-gradient(135deg, rgba(0,194,255,${0.12 + v * 0.78}), rgba(122,61,255,${0.08 + v * 0.62}))`,
-                  }}
-                />
-              ))}
-            </div>
-          </article>
-
-          <article className="panel">
-            <div className="section-label">
-              <span className="section-title">// THROUGHPUT</span>
-              <span className="section-value">{metrics.throughput}/s</span>
-            </div>
-            <div className="thru-bars" aria-hidden>
-              {metrics.bars.map((v, i) => (
-                <span key={i} style={{ height: `${Math.round(v * 100)}%` }} />
-              ))}
-            </div>
-            <div className="thru-pulse" aria-hidden />
-            <div className="panel-foot">
-              route health {metrics.routeHealth}% · // trace sync
-            </div>
-          </article>
         </section>
 
         <StagePanels
