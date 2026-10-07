@@ -1,0 +1,52 @@
+# MAGPIE SWARM - Fleet 7 Ignite
+
+**Vault** 1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15 | **ROOT** a4f83c79d10e5b8823f46104bc8d77e21a00192dfc9918bc3604f08e43217bca | **MA** e7b3d500a9c1f4d8 | **G\*** 51.2 | **Fleet** 7
+
+> Overhaul Y371 to $15M - 10 apps live. 7-agent consensus swarm.
+
+## Agents
+- ALPHA 1.49 Architect
+- BETA 1.54 Backend  
+- GAMMA 1.32 Frontend
+- DELTA 1.16 Monetizer
+- EPSILON 0.20 QA
+- GENIE 1.35 Scribe
+- ZETA 1.28 Deployer
+
+Threshold: coh > 0.6 = GRANT
+
+## Quick Start (No Zip Needed)
+
+1. Go to github.com/snowphantom/fleet-hud
+2. Click **Add file → Create new file**
+3. Paste path from this drop (e.g. `.github/workflows/swarm-orchestrator.yml`)
+4. Paste content (tap COPY button)
+5. Commit directly to main
+6. Repeat for all 7 files
+7. Go to Actions tab → Run **MAGPIE SWARM - Ignite Build Team**
+
+### Commands
+```bash
+npm install
+npm run swarm:ignite    # Merge 7 agents, check coh, evolve MA
+npm run swarm:consensus # Python fleet check
+npm run swarm:sheet     # Update sheet 1FfL4pj7...
+npm run swarm:stripe    # Parse acct_1UFpVPEAnsPuMMeH
+npm run swarm:full      # Full pipeline
+```
+
+### MA Evolution
+```
+MA_next = C.h(MA|swarm|GRANT|★) = SHA256(MA|swarm_id|grants|★|avg_coh)[:16]
+```
+
+### Secrets Required
+- `CLAUDE_WEBHOOK_URL`
+- `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+- `GOOGLE_SERVICE_ACCOUNT` (for sheet)
+- `STRIPE_SECRET_KEY`
+
+Fleet 7 consensus > 60% = deploy.
+
+---
+Drop generated for snowphantom - mobile no-download version.
