@@ -1,0 +1,81 @@
+/**
+ * MAGPIE SWARM - Stripe Workbench
+ * Account: acct_1UFpVPEAnsPuMMeH
+ * Parses logs for GRANT / REFUSE coherence signals
+ */
+
+const STRIPE_ACCOUNT = 'acct_1UFpVPEAnsPuMMeH';
+const COH_THRESHOLD = 0.6;
+
+const SIGNALS = {
+  GRANT: ['payment_intent.succeeded', 'checkout.session.completed', 'invoice.paid'],
+  REFUSE: ['payment_intent.payment_failed', 'charge.failed', 'invoice.payment_failed'],
+  PENDING: ['payment_intent.created', 'invoice.created']
+};
+
+function parseStripeEvent(event) {
+  const type = event.type;
+  let decision = 'PENDING';
+  let coh = 0.5;
+
+  if (SIGNALS.GRANT.includes(type)) {
+    decision = 'GRANT';
+    coh = 1.0 + Math.random() * 0.6; // 1.0 - 1.6 coherence boost
+  } else if (SIGNALS.REFUSE.includes(type)) {
+    decision = 'REFUSE';
+    coh = Math.random() * 0.4; // low coherence
+  }
+
+  return {
+    id: event.id,
+    type,
+    account: STRIPE_ACCOUNT,
+    decision,
+    coherence: Number(coh.toFixed(3)),
+    amount: event.data?.object?.amount || 0,
+    timestamp: new Date(event.created * 1000).toISOString(),
+    vault: '1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15',
+    g_star: 51.2
+  };
+}
+
+async function workbench(events = []) {
+  console.log(`[STRIPE] Workbench acct_${STRIPE_ACCOUNT.slice(-6)} // ${events.length} events`);
+  
+  const parsed = events.map(parseStripeEvent);
+  const grants = parsed.filter(p => p.decision === 'GRANT');
+  const refuses = parsed.filter(p => p.decision === 'REFUSE');
+  
+  const avgCoh = parsed.length ? parsed.reduce((s, p) => s + p.coherence, 0) / parsed.length : 0;
+  const revenue = grants.reduce((s, p) => s + (p.amount || 0), 0) / 100;
+
+  const report = {
+    account: STRIPE_ACCOUNT,
+    total_events: parsed.length,
+    grants: grants.length,
+    refuses: refuses.length,
+    avg_coherence: Number(avgCoh.toFixed(3)),
+    revenue_usd: revenue,
+    coherence_pass: avgCoh > COH_THRESHOLD,
+    g_star: 51.2,
+    timestamp: new Date().toISOString(),
+    details: parsed
+  };
+
+  const fs = require('fs');
+  fs.mkdirSync('dist', { recursive: true });
+  fs.writeFileSync('dist/stripe-workbench.json', JSON.stringify(report, null, 2));
+  
+  console.log(`[STRIPE] Grants: ${grants.length} | Refuses: ${refuses.length} | Coh: ${avgCoh.toFixed(3)} | $${revenue}`);
+  return report;
+}
+
+module.exports = { parseStripeEvent, workbench, STRIPE_ACCOUNT };
+
+// CLI: node scripts/stripe-workbench.js ./logs.json
+if (require.main === module) {
+  const fs = require('fs');
+  const file = process.argv[2];
+  const events = file && fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : [];
+  workbench(events);
+}
