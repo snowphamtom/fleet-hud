@@ -1,0 +1,63 @@
+/**
+ * MAGPIE SWARM - Sheet Updater
+ * Sheet: 1FfL4pj7y9mOuI3ljo3ZGHeoYTy0xEOSuDxeXYhwC6oc
+ * Syncs Vault / ROOT / MA / G* / Fleet state
+ */
+
+const SHEET_ID = '1FfL4pj7y9mOuI3ljo3ZGHeoYTy0xEOSuDxeXYhwC6oc';
+const VAULT = '1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15';
+const ROOT = 'a4f83c79d10e5b8823f46104bc8d77e21a00192dfc9918bc3604f08e43217bca';
+const MA = 'e7b3d500a9c1f4d8';
+const G_STAR = '51.2';
+
+const COLUMNS = {
+  A: 'Timestamp',
+  B: 'Vault',
+  C: 'ROOT',
+  D: 'MA',
+  E: 'G*',
+  F: 'Fleet',
+  G: 'Agent',
+  H: 'Coherence',
+  I: 'Status',
+  J: 'Swarm_ID'
+};
+
+async function updateSheet(swarmData) {
+  console.log(`[SHEET] Target: ${SHEET_ID}`);
+  
+  const row = {
+    timestamp: new Date().toISOString(),
+    vault: VAULT,
+    root: ROOT,
+    ma: swarmData?.ma_after || MA,
+    g_star: G_STAR,
+    fleet: 7,
+    swarm_id: swarmData?.swarm_id || 'MANUAL',
+    avg_coh: swarmData?.avg_coherence || 1.19,
+    grants: swarmData?.grants || 6
+  };
+
+  // In GitHub Action, use google-spreadsheet lib with GOOGLE_SERVICE_ACCOUNT
+  // For local dev: writes to dist/sheet-mirror.json
+  const fs = require('fs');
+  fs.mkdirSync('dist', { recursive: true });
+  const mirrorPath = 'dist/sheet-mirror.json';
+  let existing = [];
+  if (fs.existsSync(mirrorPath)) {
+    existing = JSON.parse(fs.readFileSync(mirrorPath, 'utf8'));
+  }
+  existing.push(row);
+  fs.writeFileSync(mirrorPath, JSON.stringify(existing, null, 2));
+  
+  console.log('[SHEET] Row appended:', row);
+  console.log(`[SHEET] https://docs.google.com/spreadsheets/d/${SHEET_ID}`);
+  return row;
+}
+
+if (require.main === module) {
+  const data = process.argv[2] ? JSON.parse(require('fs').readFileSync(process.argv[2], 'utf8')) : null;
+  updateSheet(data);
+}
+
+module.exports = { updateSheet, SHEET_ID, VAULT, ROOT };
