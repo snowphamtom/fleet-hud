@@ -1,0 +1,81 @@
+#!/usr/bin/env python3
+"""
+MAGPIE SWARM - Fleet 7 Consensus Runner
+Checks coh>0.6, prints MA evolution: C.h(MA|swarm|GRANT|★)
+Vault: 1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15
+"""
+
+import argparse
+import hashlib
+import json
+import sys
+from datetime import datetime
+
+VAULT = "1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15"
+ROOT = "a4f83c79d10e5b8823f46104bc8d77e21a00192dfc9918bc3604f08e43217bca"
+MA_CURRENT = "e7b3d500a9c1f4d8"
+G_STAR = 51.2
+COH_THRESHOLD = 0.6
+
+AGENTS = {
+    "alpha": 1.49, "beta": 1.54, "gamma": 1.32,
+    "delta": 1.16, "epsilon": 0.20, "genie": 1.35, "zeta": 1.28
+}
+
+def evolve_ma(ma, swarm_id, grants, avg_coh):
+    payload = f"{ma}|{swarm_id}|{','.join(grants)}|★|{avg_coh}"
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+def run_consensus(args):
+    print(f"[FLEET] Fleet 7 // Vault {VAULT} // G* {G_STAR}")
+    swarm_id = f"MAGPIE-Y371-{int(datetime.now().timestamp())}-G{G_STAR}"
+    
+    # Override from args if provided
+    overrides = {}
+    for k in AGENTS:
+        v = getattr(args, k, None)
+        if v is not None:
+            overrides[k] = v
+    
+    scores = {**AGENTS, **overrides}
+    grants = [name.upper() for name, coh in scores.items() if coh > COH_THRESHOLD]
+    refuses = [name.upper() for name, coh in scores.items() if coh <= COH_THRESHOLD]
+    avg_coh = sum(scores.values()) / len(scores)
+    quorum = len(grants) / 7
+
+    print(f"[AGENTS] " + " | ".join([f"{k.upper()} {v:.2f}" for k,v in scores.items()]))
+    print(f"[CONSENSUS] Grants: {len(grants)}/7 -> {', '.join(grants)}")
+    if refuses:
+        print(f"[CONSENSUS] Refuses: {', '.join(refuses)} (coh <= {COH_THRESHOLD})")
+    print(f"[STATS] Avg Coh: {avg_coh:.3f} | Quorum: {quorum*100:.1f}%")
+
+    next_ma = evolve_ma(MA_CURRENT, swarm_id, grants, avg_coh)
+    print(f"[MA] {MA_CURRENT} -> {next_ma} :: C.h(MA|swarm|GRANT|★)")
+
+    result = {
+        "swarm_id": swarm_id,
+        "vault": VAULT,
+        "root": ROOT,
+        "ma_before": MA_CURRENT,
+        "ma_after": next_ma,
+        "g_star": G_STAR,
+        "scores": scores,
+        "grants": grants,
+        "avg_coherence": round(avg_coh, 3),
+        "quorum": quorum,
+        "status": "CONSENSUS_REACHED" if quorum >= 0.6 else "CONSENSUS_FAILED"
+    }
+
+    print(json.dumps(result, indent=2))
+    
+    if result["status"] != "CONSENSUS_REACHED":
+        sys.exit(1)
+    return result
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="MAGPIE Fleet 7 Consensus")
+    for agent in AGENTS:
+        parser.add_argument(f"--{agent}", type=float, help=f"{agent} coherence")
+    parser.add_argument("--swarm-id", type=str, default=None)
+    args = parser.parse_args()
+    run_consensus(args)
