@@ -1,0 +1,41 @@
+{
+  "name": "magpie-swarm",
+  "version": "51.2.0",
+  "description": "MAGPIE SWARM - Fleet 7 Ignite Build Team - Y371 $15M overhaul",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "swarm:ignite": "node scripts/fleet-consensus-merge.js",
+    "swarm:consensus": "python3 fleet/run_consensus.py",
+    "swarm:sheet": "node scripts/update-sheet.js dist/swarm-merged.json",
+    "swarm:stripe": "node scripts/stripe-workbench.js",
+    "swarm:full": "npm run swarm:ignite && npm run swarm:sheet && npm run swarm:stripe",
+    "dev": "vite",
+    "build": "vite build",
+    "fleet:check": "node -e \"console.log('Fleet 7 | G* 51.2 | Vault 1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15')\""
+  },
+  "dependencies": {
+    "google-spreadsheet": "^4.1.0",
+    "stripe": "^14.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "magpie": {
+    "vault": "1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15",
+    "root": "a4f83c79d10e5b8823f46104bc8d77e21a00192dfc9918bc3604f08e43217bca",
+    "ma": "e7b3d500a9c1f4d8",
+    "g_star": 51.2,
+    "fleet": 7,
+    "agents": [
+      { "name": "ALPHA", "role": "Architect", "coherence": 1.49 },
+      { "name": "BETA", "role": "Backend", "coherence": 1.54 },
+      { "name": "GAMMA", "role": "Frontend", "coherence": 1.32 },
+      { "name": "DELTA", "role": "Monetizer", "coherence": 1.16 },
+      { "name": "EPSILON", "role": "QA", "coherence": 0.20 },
+      { "name": "GENIE", "role": "Scribe", "coherence": 1.35 },
+      { "name": "ZETA", "role": "Deployer", "coherence": 1.28 }
+    ]
+  }
+}
