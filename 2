@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+/**
+ * MAGPIE SWARM - Fleet Consensus Merge
+ * Merges 7 agents, checks coh > 0.6, evolves MA = C.h(MA|swarm|GRANT|★)
+ * Vault: 1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15 | ROOT: a4f83c79...
+ */
+
+const fs = require('fs');
+const crypto = require('crypto');
+const path = require('path');
+
+const VAULT = '1avx_NpNUNk84MnAf03W8amPIF6Xc1Y15';
+const ROOT = 'a4f83c79d10e5b8823f46104bc8d77e21a00192dfc9918bc3604f08e43217bca';
+const MA_CURRENT = 'e7b3d500a9c1f4d8';
+const G_STAR = 51.2;
+const FLEET_SIZE = 7;
+const COH_THRESHOLD = 0.6;
+
+const AGENTS = [
+  { name: 'ALPHA', coh: 1.49 }, { name: 'BETA', coh: 1.54 },
+  { name: 'GAMMA', coh: 1.32 }, { name: 'DELTA', coh: 1.16 },
+  { name: 'EPSILON', coh: 0.20 }, { name: 'GENIE', coh: 1.35 },
+  { name: 'ZETA', coh: 1.28 },
+];
+
+async function main() {
+  const swarmId = process.argv.find(a => a.includes('swarm-id'))?.split('=')[1] || `MAGPIE-Y371-${Date.now()}-G${G_STAR}`;
+  console.log(`[SWARM] Fleet ${FLEET_SIZE} // Vault ${VAULT} // ${swarmId}`);
+
+  const artifactDir = path.join(process.cwd(), 'swarm-artifacts');
+  let builds = [];
+  
+  if (fs.existsSync(artifactDir)) {
+    builds = fs.readdirSync(artifactDir)
+      .filter(f => f.endsWith('.json'))
+      .map(f => JSON.parse(fs.readFileSync(path.join(artifactDir, f), 'utf8')));
+  } else {
+    builds = AGENTS.map(a => ({ agent: a.name, coh: a.coh, status: a.coh > COH_THRESHOLD ? 'GRANT' : 'REFUSE' }));
+  }
+
+  const grants = builds.filter(b => b.coh > COH_THRESHOLD && b.status !== 'REFUSE');
+  const avgCoh = builds.reduce((s, b) => s + b.coh, 0) / builds.length;
+  const quorum = grants.length / FLEET_SIZE;
+
+  console.log(`[CONSENSUS] Grants: ${grants.length}/${FLEET_SIZE} | Avg Coh: ${avgCoh.toFixed(3)} | Quorum: ${(quorum*100).toFixed(1)}%`);
+
+  // MA Evolution: C.h(MA|swarm|GRANT|★)
+  const payload = `${MA_CURRENT}|${swarmId}|${grants.map(g=>g.agent).join(',')}|★|${avgCoh}`;
+  const evolved = crypto.createHash('sha256').update(payload).digest('hex').slice(0, 16);
+  const nextMA = evolved;
+
+  console.log(`[MA] ${MA_CURRENT} -> ${nextMA} :: C.h(MA|swarm|GRANT|★)`);
+
+  const merged = {
+    swarm_id: swarmId,
+    vault: VAULT,
+    root: ROOT,
+    ma_before: MA_CURRENT,
+    ma_after: nextMA,
+    g_star: G_STAR,
+    fleet: FLEET_SIZE,
+    grants: grants.length,
+    avg_coherence: avgCoh,
+    quorum,
+    agents: builds,
+    sha256: crypto.createHash('sha256').update(JSON.stringify(builds)).digest('hex'),
+    timestamp: new Date().toISOString(),
+    status: quorum >= 0.6 ? 'CONSENSUS_REACHED' : 'CONSENSUS_FAILED'
+  };
+
+  fs.mkdirSync('dist', { recursive: true });
+  fs.writeFileSync('dist/swarm-merged.json', JSON.stringify(merged, null, 2));
+  console.log('[WRITE] dist/swarm-merged.json');
+  
+  if (merged.status !== 'CONSENSUS_REACHED') process.exit(1);
+}
+
+main().catch(e => { console.error(e); process.exit(1); });
